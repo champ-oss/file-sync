@@ -13,6 +13,11 @@ A GitHub Action which synchronizes files from another repository
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=file-sync_champ-oss&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=file-sync_champ-oss)
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=file-sync_champ-oss&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=file-sync_champ-oss)
 
+## Features
+- Keeps files across multiple repositories up to date automatically
+- Opens a pull request for file sync updates
+- Easily configurable
+
 ## Example Usage
 
 ```yaml
@@ -32,6 +37,14 @@ jobs:
             .gitignore
             LICENSE
 ```
+
+## Token
+By default the `GITHUB_TOKEN` should be passed to the `actions/checkout` step as well as this action (see example usage). This is necessary for the action to be allowed to push changes to a branch as well as open a pull request.
+
+*Important:*
+
+If you are syncing workflow files (`.github/workflows`) then you will need to generate and use a Personal Access Token (PAT) with `repo` and `workflow` permissions. 
+
 
 ## Parameters
 | Parameter | Required | Description |
