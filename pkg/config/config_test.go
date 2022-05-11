@@ -11,6 +11,16 @@ func Test_GetFiles(t *testing.T) {
 	assert.Equal(t, []string{"file1", "file2", "file3"}, GetFiles())
 }
 
+func Test_GetFiles_Newline(t *testing.T) {
+	_ = os.Setenv("INPUT_FILES", "file1\nfile2\nfile3\n")
+	assert.Equal(t, []string{"file1", "file2", "file3"}, GetFiles())
+}
+
+func Test_GetFiles_Extra_Space(t *testing.T) {
+	_ = os.Setenv("INPUT_FILES", "file1\nfile2\nfile3\n ")
+	assert.Equal(t, []string{"file1", "file2", "file3"}, GetFiles())
+}
+
 func Test_GetCommitMessage(t *testing.T) {
 	_ = os.Setenv("INPUT_COMMIT_MESSAGE", "test123")
 	assert.Equal(t, "test123", GetCommitMessage())

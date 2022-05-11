@@ -71,7 +71,12 @@ func GetRepoName() string {
 
 func GetFiles() []string {
 	value := getEnvRequired("INPUT_FILES")
-	files := strings.Split(value, "\n")
+	var files []string
+	for _, f := range strings.Split(value, "\n") {
+		if strings.TrimSpace(f) != "" {
+			files = append(files, f)
+		}
+	}
 	log.Debugf("files: %s", files)
 	return files
 }
