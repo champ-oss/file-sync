@@ -57,3 +57,6 @@ If you are syncing workflow files (`.github/workflows`) then you will need to ge
 | user | false | Git username |
 | email | false | Git email |
 | commit-message | false | Updated by file-sync |
+
+## Contributing
+
