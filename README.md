@@ -1,10 +1,19 @@
 # file-sync
 
-A GitHub Action to sync files from another repository
+A GitHub Action which synchronizes files from another repository
 
-![test](https://github.com/champ-oss/file-sync/workflows/gotest/badge.svg)
+[![.github/workflows/gotest.yml](https://github.com/champ-oss/file-sync/actions/workflows/gotest.yml/badge.svg?branch=main)](https://github.com/champ-oss/file-sync/actions/workflows/gotest.yml)
+[![.github/workflows/golint.yml](https://github.com/champ-oss/file-sync/actions/workflows/golint.yml/badge.svg?branch=main)](https://github.com/champ-oss/file-sync/actions/workflows/golint.yml)
+[![.github/workflows/release.yml](https://github.com/champ-oss/file-sync/actions/workflows/release.yml/badge.svg)](https://github.com/champ-oss/file-sync/actions/workflows/release.yml)
+[![.github/workflows/sonar.yml](https://github.com/champ-oss/file-sync/actions/workflows/sonar.yml/badge.svg)](https://github.com/champ-oss/file-sync/actions/workflows/sonar.yml)
 
-## Example
+[![SonarCloud](https://sonarcloud.io/images/project_badges/sonarcloud-black.svg)](https://sonarcloud.io/summary/new_code?id=file-sync_champ-oss)
+
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=file-sync_champ-oss&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=file-sync_champ-oss)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=file-sync_champ-oss&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=file-sync_champ-oss)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=file-sync_champ-oss&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=file-sync_champ-oss)
+
+## Example Usage
 
 ```yaml
 jobs:
