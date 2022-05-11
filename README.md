@@ -32,3 +32,15 @@ jobs:
             .gitignore
             LICENSE
 ```
+
+## Parameters
+| Parameter | Required | Description |
+| --- | --- | --- |
+| token | false | GitHub Token or PAT |
+| repo | true | Source GitHub repo |
+| files | true | List of files to sync |
+| target-branch | false | Target branch for pull request |
+| pull-request-branch | false | Branch to push changes |
+| user | false | Git username |
+| email | false | Git email |
+| commit-message | false | Updated by file-sync |
