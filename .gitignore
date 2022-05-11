@@ -45,5 +45,3 @@ override.tf.json
 .settings/
 .classpath
 .project
-
-cover.out
