@@ -14,7 +14,7 @@ A GitHub Action which synchronizes files from another repository
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=file-sync_champ-oss&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=file-sync_champ-oss)
 
 ## Features
-- Keeps files across multiple repositories up to date automatically
+- Keep files across multiple repositories up to date automatically
 - Opens a pull request for file sync updates
 - Easily configurable
 
@@ -35,7 +35,9 @@ jobs:
           repo: champ-oss/terraform-module-template
           files: |
             .gitignore
-            LICENSE
+            Makefile
+            templates/LICENSE-template=LICENSE
+            myworkflow.yml=.github/workflows/build.yml
 ```
 
 ## Token
@@ -44,6 +46,23 @@ By default the `GITHUB_TOKEN` should be passed to the `actions/checkout` step as
 *Important:*
 
 If you are syncing workflow files (`.github/workflows`) then you will need to generate and use a Personal Access Token (PAT) with `repo` and `workflow` permissions. 
+
+
+## File list
+One file should be specified per-line. You can specify the file in the format `<source_path>=<destination_path`. The paths are relative to the root of the source and destination repositories. 
+For example:
+```yaml
+  files: |
+    templates/mystuff/.gitignore.tmpl=.gitignore
+    myworkflow.yml=.github/workflows/build.yml
+```
+
+Or, if only a filename is specified then file will be copied from the source to the destination in the same directory path and name.
+For example:
+```yaml
+  files: |
+    .gitignore
+```
 
 
 ## Parameters

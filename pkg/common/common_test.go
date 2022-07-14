@@ -2,6 +2,7 @@ package common
 
 import (
 	"bytes"
+	"github.com/champ-oss/file-sync/pkg/config"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"os"
@@ -85,11 +86,21 @@ func Test_copySourceFiles_Success(t *testing.T) {
 	destDir, _ := ioutil.TempDir("", "dest")
 	defer RemoveDir(sourceDir)
 
-	assert.NoError(t, CopySourceFiles([]string{"test.txt"}, sourceDir, destDir))
+	assert.NoError(t, CopySourceFiles([]config.File{
+		{
+			Source:      "test.txt",
+			Destination: "test1/test2/test.txt",
+		},
+	}, sourceDir, destDir))
 }
 
 func Test_copySourceFiles_Error(t *testing.T) {
-	assert.Error(t, CopySourceFiles([]string{"test.txt"}, "/foo", "/foo"))
+	assert.Error(t, CopySourceFiles([]config.File{
+		{
+			Source:      "foo.txt",
+			Destination: "test1/test2/foo.txt",
+		},
+	}, "/foo", "/foo"))
 }
 
 func Test_RunCommand_Success(t *testing.T) {

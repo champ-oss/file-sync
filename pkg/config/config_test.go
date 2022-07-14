@@ -7,18 +7,63 @@ import (
 )
 
 func Test_GetFiles(t *testing.T) {
-	_ = os.Setenv("INPUT_FILES", "file1\nfile2\nfile3")
-	assert.Equal(t, []string{"file1", "file2", "file3"}, GetFiles())
+	_ = os.Setenv("INPUT_FILES", "file1\nfile2")
+	expected := []File{
+		{
+			Source:      "file1",
+			Destination: "file1",
+		},
+		{
+			Source:      "file2",
+			Destination: "file2",
+		},
+	}
+	assert.Equal(t, expected, GetFiles())
 }
 
 func Test_GetFiles_Newline(t *testing.T) {
-	_ = os.Setenv("INPUT_FILES", "file1\nfile2\nfile3\n")
-	assert.Equal(t, []string{"file1", "file2", "file3"}, GetFiles())
+	_ = os.Setenv("INPUT_FILES", "file1\nfile2a=file2b\n")
+	expected := []File{
+		{
+			Source:      "file1",
+			Destination: "file1",
+		},
+		{
+			Source:      "file2a",
+			Destination: "file2b",
+		},
+	}
+	assert.Equal(t, expected, GetFiles())
 }
 
 func Test_GetFiles_Extra_Space(t *testing.T) {
-	_ = os.Setenv("INPUT_FILES", "file1\nfile2\nfile3\n ")
-	assert.Equal(t, []string{"file1", "file2", "file3"}, GetFiles())
+	_ = os.Setenv("INPUT_FILES", "file1\n file2a=file2b\n ")
+	expected := []File{
+		{
+			Source:      "file1",
+			Destination: "file1",
+		},
+		{
+			Source:      "file2a",
+			Destination: "file2b",
+		},
+	}
+	assert.Equal(t, expected, GetFiles())
+}
+
+func Test_GetFiles_With_Paths(t *testing.T) {
+	_ = os.Setenv("INPUT_FILES", "file1a=/tmp/foo/file1b\n/tmp/bar1/file2a=/tmp/bar2/file2b\n")
+	expected := []File{
+		{
+			Source:      "file1a",
+			Destination: "/tmp/foo/file1b",
+		},
+		{
+			Source:      "/tmp/bar1/file2a",
+			Destination: "/tmp/bar2/file2b",
+		},
+	}
+	assert.Equal(t, expected, GetFiles())
 }
 
 func Test_GetCommitMessage(t *testing.T) {

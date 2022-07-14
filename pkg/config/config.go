@@ -6,6 +6,11 @@ import (
 	"strings"
 )
 
+type File struct {
+	Source      string
+	Destination string
+}
+
 func GetWorkspace() string {
 	value := getEnvRequired("GITHUB_WORKSPACE")
 	log.Debugf("github workspace: %s", value)
@@ -69,12 +74,26 @@ func GetRepoName() string {
 	return parts[1]
 }
 
-func GetFiles() []string {
+// GetFiles parses the list of files from environment variable.
+// Files should be specified one per line, optionally with an equal sign separating source and destination
+func GetFiles() []File {
 	value := getEnvRequired("INPUT_FILES")
-	var files []string
+	var files []File
+
 	for _, f := range strings.Split(value, "\n") {
-		if strings.TrimSpace(f) != "" {
-			files = append(files, f)
+		if strings.TrimSpace(f) == "" {
+			continue
+		}
+		if strings.Contains(f, "=") {
+			files = append(files, File{
+				Source:      strings.Split(strings.TrimSpace(f), "=")[0],
+				Destination: strings.Split(strings.TrimSpace(f), "=")[1],
+			})
+		} else {
+			files = append(files, File{
+				Source:      strings.TrimSpace(f),
+				Destination: strings.TrimSpace(f),
+			})
 		}
 	}
 	log.Debugf("files: %s", files)

@@ -61,7 +61,7 @@ func main() {
 		log.Info("all files are up to date")
 	} else {
 		for _, f := range files {
-			err = cli.Add(workspace, f)
+			err = cli.Add(workspace, f.Destination)
 			if err != nil {
 				panic(err)
 			}
