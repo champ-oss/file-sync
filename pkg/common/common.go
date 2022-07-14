@@ -3,6 +3,7 @@ package common
 import (
 	"bytes"
 	"fmt"
+	"github.com/champ-oss/file-sync/pkg/config"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"os"
@@ -16,10 +17,10 @@ func RemoveDir(dir string) {
 	}
 }
 
-func CopySourceFiles(files []string, sourceDir, destDir string) error {
+func CopySourceFiles(files []config.File, sourceDir, destDir string) error {
 	for _, f := range files {
-		sourcePath := filepath.Join(sourceDir, f)
-		destPath := filepath.Join(destDir, f)
+		sourcePath := filepath.Join(sourceDir, f.Source)
+		destPath := filepath.Join(destDir, f.Destination)
 		log.Debugf("Copying %s to %s", sourcePath, destPath)
 		if err := CopyFile(sourcePath, destPath); err != nil {
 			log.Error("error copying files from source")

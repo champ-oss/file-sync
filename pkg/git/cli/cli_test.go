@@ -2,6 +2,7 @@ package cli
 
 import (
 	"github.com/champ-oss/file-sync/pkg/common"
+	"github.com/champ-oss/file-sync/pkg/config"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
@@ -310,7 +311,12 @@ func Test_AnyModified_Clean(t *testing.T) {
 		panic(err)
 	}
 
-	assert.False(t, AnyModified(repoDir, []string{"LICENSE"}))
+	assert.False(t, AnyModified(repoDir, []config.File{
+		{
+			Source:      "",
+			Destination: "LICENSE",
+		},
+	}))
 }
 
 func Test_AnyModified_Modified(t *testing.T) {
@@ -325,7 +331,16 @@ func Test_AnyModified_Modified(t *testing.T) {
 		panic(err)
 	}
 
-	assert.True(t, AnyModified(repoDir, []string{"LICENSE", "CHANGELOG"}))
+	assert.True(t, AnyModified(repoDir, []config.File{
+		{
+			Source:      "",
+			Destination: "LICENSE",
+		},
+		{
+			Source:      "",
+			Destination: "CHANGELOG",
+		},
+	}))
 }
 
 func Test_Reset_Success(t *testing.T) {

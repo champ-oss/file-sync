@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 	"github.com/champ-oss/file-sync/pkg/common"
+	"github.com/champ-oss/file-sync/pkg/config"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"strings"
@@ -64,9 +65,9 @@ func Status(repoDir, fileName string) string {
 	return output
 }
 
-func AnyModified(repoDir string, files []string) bool {
+func AnyModified(repoDir string, files []config.File) bool {
 	for _, f := range files {
-		if status := Status(repoDir, f); status != "" {
+		if status := Status(repoDir, f.Destination); status != "" {
 			return true
 		}
 	}
