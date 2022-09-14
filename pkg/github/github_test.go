@@ -15,7 +15,3 @@ func Test_CreatePullRequest(t *testing.T) {
 	err := CreatePullRequest(client, "owner1", "repo1", "my pull request", "test-branch", "main")
 	assert.Contains(t, err.Error(), "404 Not Found")
 }
-
-func Test_CreatePullRequest_Already_Open(t *testing.T) {}
-
-func Test_CreatePullRequest_Invalid_Head(t *testing.T) {}
