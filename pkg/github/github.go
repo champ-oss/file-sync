@@ -32,6 +32,10 @@ func CreatePullRequest(client *github.Client, owner, repo, title, head, base str
 			log.Info("pull request not needed")
 			return nil
 		}
+		if strings.Contains(err.Error(), "Message:No commits between") {
+			log.Info("pull request not needed")
+			return nil
+		}
 		return err
 	}
 	return nil
