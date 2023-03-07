@@ -6,7 +6,7 @@ require (
 	github.com/go-git/go-git/v5 v5.5.2
 	github.com/google/go-github/v44 v44.1.0
 	github.com/sirupsen/logrus v1.9.0
-	github.com/stretchr/testify v1.8.1
+	github.com/stretchr/testify v1.8.2
 	golang.org/x/oauth2 v0.6.0
 )
 
