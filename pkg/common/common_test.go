@@ -4,14 +4,13 @@ import (
 	"bytes"
 	"github.com/champ-oss/file-sync/pkg/config"
 	"github.com/stretchr/testify/assert"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
 )
 
 func Test_RemoveDir(t *testing.T) {
-	dir, _ := ioutil.TempDir("", "test")
+	dir, _ := os.MkdirTemp("", "test")
 	assert.NotPanics(t, func() {
 		RemoveDir(dir)
 	})
@@ -19,10 +18,10 @@ func Test_RemoveDir(t *testing.T) {
 
 func Test_copyFile_Success(t *testing.T) {
 	// Write a test file to a test source directory
-	sourceDir, _ := ioutil.TempDir("", "source")
+	sourceDir, _ := os.MkdirTemp("", "source")
 	defer RemoveDir(sourceDir)
 	sourceFile := filepath.Join(sourceDir, "test.txt")
-	err := ioutil.WriteFile(sourceFile, []byte("test"), 0644)
+	err := os.WriteFile(sourceFile, []byte("test"), 0644)
 	assert.NoError(t, err)
 
 	// Copy file and check if it exists in destination
@@ -38,10 +37,10 @@ func Test_copyFile_Bad_Source(t *testing.T) {
 
 func Test_copyFile_Bad_Destination(t *testing.T) {
 	// Write a test file to a test source directory
-	sourceDir, _ := ioutil.TempDir("", "source")
+	sourceDir, _ := os.MkdirTemp("", "source")
 	defer RemoveDir(sourceDir)
 	sourceFile := filepath.Join(sourceDir, "test.txt")
-	err := ioutil.WriteFile(sourceFile, []byte("test"), 0644)
+	err := os.WriteFile(sourceFile, []byte("test"), 0644)
 	assert.NoError(t, err)
 	_, err = os.Stat(sourceFile)
 	assert.NoError(t, err)
@@ -52,16 +51,16 @@ func Test_copyFile_Bad_Destination(t *testing.T) {
 
 func Test_copyFile_Create_Dir(t *testing.T) {
 	// Write a test file to a test source directory
-	sourceDir, _ := ioutil.TempDir("", "source")
+	sourceDir, _ := os.MkdirTemp("", "source")
 	defer RemoveDir(sourceDir)
 	sourceFile := filepath.Join(sourceDir, "test.txt")
-	err := ioutil.WriteFile(sourceFile, []byte("test"), 0644)
+	err := os.WriteFile(sourceFile, []byte("test"), 0644)
 	assert.NoError(t, err)
 	_, err = os.Stat(sourceFile)
 	assert.NoError(t, err)
 
 	// Create a test destination directory
-	destDir, _ := ioutil.TempDir("", "dest")
+	destDir, _ := os.MkdirTemp("", "dest")
 	defer RemoveDir(sourceDir)
 
 	// Use a nested directory that does not exist
@@ -74,16 +73,16 @@ func Test_copyFile_Create_Dir(t *testing.T) {
 
 func Test_copySourceFiles_Success(t *testing.T) {
 	// Write a test file to a test source directory
-	sourceDir, _ := ioutil.TempDir("", "source")
+	sourceDir, _ := os.MkdirTemp("", "source")
 	defer RemoveDir(sourceDir)
 	sourceFile := filepath.Join(sourceDir, "test.txt")
-	err := ioutil.WriteFile(sourceFile, []byte("test"), 0644)
+	err := os.WriteFile(sourceFile, []byte("test"), 0644)
 	assert.NoError(t, err)
 	_, err = os.Stat(sourceFile)
 	assert.NoError(t, err)
 
 	// Create a test destination directory
-	destDir, _ := ioutil.TempDir("", "dest")
+	destDir, _ := os.MkdirTemp("", "dest")
 	defer RemoveDir(sourceDir)
 
 	assert.NoError(t, CopySourceFiles([]config.File{
@@ -104,27 +103,27 @@ func Test_copySourceFiles_Error(t *testing.T) {
 }
 
 func Test_RunCommand_Success(t *testing.T) {
-	dir, _ := ioutil.TempDir("", "test")
+	dir, _ := os.MkdirTemp("", "test")
 	output, err := RunCommand(dir, "echo", "foo")
 	assert.Contains(t, output, "foo")
 	assert.NoError(t, err)
 }
 
 func Test_RunCommand_Error(t *testing.T) {
-	dir, _ := ioutil.TempDir("", "test")
+	dir, _ := os.MkdirTemp("", "test")
 	output, err := RunCommand(dir, "foo", "foo")
 	assert.Contains(t, output, "")
 	assert.Error(t, err)
 }
 
 func Test_RunCommandNoLog_Success(t *testing.T) {
-	dir, _ := ioutil.TempDir("", "test")
+	dir, _ := os.MkdirTemp("", "test")
 	err := RunCommandNoLog(dir, "echo", "foo")
 	assert.NoError(t, err)
 }
 
 func Test_RunCommandNoLog_Error(t *testing.T) {
-	dir, _ := ioutil.TempDir("", "test")
+	dir, _ := os.MkdirTemp("", "test")
 	err := RunCommandNoLog(dir, "foo", "foo")
 	assert.Error(t, err)
 }

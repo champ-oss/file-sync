@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/champ-oss/file-sync/pkg/config"
 	log "github.com/sirupsen/logrus"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -31,7 +30,7 @@ func CopySourceFiles(files []config.File, sourceDir, destDir string) error {
 }
 
 func CopyFile(source, dest string) error {
-	input, err := ioutil.ReadFile(source)
+	input, err := os.ReadFile(source)
 	if err != nil {
 		return err
 	}
@@ -42,7 +41,7 @@ func CopyFile(source, dest string) error {
 		}
 	}
 
-	err = ioutil.WriteFile(dest, input, 0644)
+	err = os.WriteFile(dest, input, 0644)
 	return err
 }
 
