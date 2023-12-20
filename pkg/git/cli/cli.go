@@ -5,7 +5,7 @@ import (
 	"github.com/champ-oss/file-sync/pkg/common"
 	"github.com/champ-oss/file-sync/pkg/config"
 	log "github.com/sirupsen/logrus"
-	"io/ioutil"
+	"os"
 	"strings"
 )
 
@@ -21,7 +21,7 @@ func CloneFromGitHub(repo string, token string) (dir string, err error) {
 
 func Clone(repo string) (dir string, err error) {
 	log.Debug("Creating temp directory for repository")
-	dir, _ = ioutil.TempDir("", "repo")
+	dir, _ = os.MkdirTemp("", "repo")
 
 	err = common.RunCommandNoLog("./", "git", "clone", repo, dir)
 	if err != nil {

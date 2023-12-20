@@ -5,7 +5,6 @@ import (
 	"github.com/champ-oss/file-sync/pkg/config"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -133,7 +132,7 @@ func Test_Status_Modified(t *testing.T) {
 		panic(err)
 	}
 
-	err = ioutil.WriteFile(filepath.Join(repoDir, "LICENSE"), []byte("test"), 0644)
+	err = os.WriteFile(filepath.Join(repoDir, "LICENSE"), []byte("test"), 0644)
 	output := Status(repoDir, "LICENSE")
 	assert.Equal(t, " M LICENSE\n", output)
 	assert.Nil(t, err)
@@ -154,7 +153,7 @@ func Test_Add_Success(t *testing.T) {
 		panic(err)
 	}
 
-	err = ioutil.WriteFile(filepath.Join(repoDir, "LICENSE"), []byte("test"), 0644)
+	err = os.WriteFile(filepath.Join(repoDir, "LICENSE"), []byte("test"), 0644)
 	if err != nil {
 		panic(err)
 	}
@@ -189,7 +188,7 @@ func Test_Commit_Success(t *testing.T) {
 		panic(err)
 	}
 
-	err = ioutil.WriteFile(filepath.Join(repoDir, "LICENSE"), []byte("test"), 0644)
+	err = os.WriteFile(filepath.Join(repoDir, "LICENSE"), []byte("test"), 0644)
 	if err != nil {
 		panic(err)
 	}
@@ -255,7 +254,7 @@ func Test_Push_Success(t *testing.T) {
 		panic(err)
 	}
 
-	err = ioutil.WriteFile(filepath.Join(repoDir, "LICENSE"), []byte("test"), 0644)
+	err = os.WriteFile(filepath.Join(repoDir, "LICENSE"), []byte("test"), 0644)
 	if err != nil {
 		panic(err)
 	}
@@ -326,7 +325,7 @@ func Test_AnyModified_Modified(t *testing.T) {
 		panic(err)
 	}
 
-	err = ioutil.WriteFile(filepath.Join(repoDir, "CHANGELOG"), []byte("test"), 0644)
+	err = os.WriteFile(filepath.Join(repoDir, "CHANGELOG"), []byte("test"), 0644)
 	if err != nil {
 		panic(err)
 	}

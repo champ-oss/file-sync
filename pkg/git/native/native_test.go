@@ -3,7 +3,6 @@ package native
 import (
 	"github.com/champ-oss/file-sync/pkg/common"
 	"github.com/stretchr/testify/assert"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -58,7 +57,7 @@ func Test_isWorktreeModified_Modified(t *testing.T) {
 	}
 
 	// Write modifications to an existing file in the git repository
-	err = ioutil.WriteFile(filepath.Join(repoDir, "LICENSE"), []byte("test"), 0644)
+	err = os.WriteFile(filepath.Join(repoDir, "LICENSE"), []byte("test"), 0644)
 	assert.NoError(t, err)
 
 	worktree, err := repo.Worktree()
@@ -82,7 +81,7 @@ func Test_isWorktreeModified_New(t *testing.T) {
 	}
 
 	// Write a new file in the git repository
-	err = ioutil.WriteFile(filepath.Join(repoDir, "foo-new-file.txt"), []byte("test"), 0644)
+	err = os.WriteFile(filepath.Join(repoDir, "foo-new-file.txt"), []byte("test"), 0644)
 	assert.NoError(t, err)
 
 	worktree, err := repo.Worktree()
@@ -163,7 +162,7 @@ func Test_gitAddFiles_Success(t *testing.T) {
 	}
 
 	// Write a new file in the git repository
-	err = ioutil.WriteFile(filepath.Join(repoDir, "foo-new-file.txt"), []byte("test"), 0644)
+	err = os.WriteFile(filepath.Join(repoDir, "foo-new-file.txt"), []byte("test"), 0644)
 	assert.NoError(t, err)
 
 	worktree, err := repo.Worktree()
@@ -201,7 +200,7 @@ func Test_createCommit_Success(t *testing.T) {
 	}
 
 	// Write a new file in the git repository
-	err = ioutil.WriteFile(filepath.Join(repoDir, "foo-new-file.txt"), []byte("test"), 0644)
+	err = os.WriteFile(filepath.Join(repoDir, "foo-new-file.txt"), []byte("test"), 0644)
 	if err != nil {
 		panic(err)
 	}
@@ -248,7 +247,7 @@ func Test_gitPush_Success(t *testing.T) {
 	}
 
 	// Write a new file in the git repository
-	err = ioutil.WriteFile(filepath.Join(repoDir, "foo-new-file.txt"), []byte("test"), 0644)
+	err = os.WriteFile(filepath.Join(repoDir, "foo-new-file.txt"), []byte("test"), 0644)
 	assert.NoError(t, err)
 
 	// Git add and commit
