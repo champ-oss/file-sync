@@ -7,7 +7,6 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	log "github.com/sirupsen/logrus"
-	"io/ioutil"
 	"os"
 	"strings"
 	"time"
@@ -15,7 +14,7 @@ import (
 
 func cloneSourceRepo(sourceRepo string) (dir string, err error) {
 	log.Debug("Creating temp directory for source repository")
-	dir, _ = ioutil.TempDir("", "source")
+	dir, _ = os.MkdirTemp("", "source")
 
 	log.Infof("Cloning source repository %s to %s", sourceRepo, dir)
 	if _, err := git.PlainClone(dir, false, &git.CloneOptions{URL: sourceRepo, Progress: os.Stdout}); err != nil {
