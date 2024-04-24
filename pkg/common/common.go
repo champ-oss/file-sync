@@ -22,8 +22,7 @@ func CopySourceFiles(files []config.File, sourceDir, destDir string) error {
 		destPath := filepath.Join(destDir, f.Destination)
 		log.Debugf("Copying %s to %s", sourcePath, destPath)
 		if err := CopyFile(sourcePath, destPath); err != nil {
-			log.Error("error copying files from source")
-			return err
+			log.Error("error copying file from source")
 		}
 	}
 	return nil
