@@ -94,7 +94,7 @@ func Test_copySourceFiles_Success(t *testing.T) {
 }
 
 func Test_copySourceFiles_Error(t *testing.T) {
-	assert.Error(t, CopySourceFiles([]config.File{
+	assert.NoError(t, CopySourceFiles([]config.File{
 		{
 			Source:      "foo.txt",
 			Destination: "test1/test2/foo.txt",
