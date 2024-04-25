@@ -344,6 +344,10 @@ func Test_AnyModified_Modified(t *testing.T) {
 			Source:      "",
 			Destination: "CHANGELOG",
 		},
+		{
+			Source:      "",
+			Destination: "239856bgv2983576gb2.txt",
+		},
 	}))
 }
 

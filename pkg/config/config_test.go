@@ -132,7 +132,7 @@ func Test_getEnvRequired_Set(t *testing.T) {
 }
 
 func Test_GetDeleteFiles(t *testing.T) {
-	_ = os.Setenv("INPUT_DELETE_FILES", "file1\nfile2")
+	_ = os.Setenv("INPUT_DELETE_FILES", "file1\n file2")
 	expected := []File{
 		{
 			Source:      "file1",
