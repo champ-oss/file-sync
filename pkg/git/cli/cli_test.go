@@ -143,7 +143,7 @@ func Test_Status_Error(t *testing.T) {
 	defer common.RemoveDir(repoDir)
 
 	output := Status(repoDir, "foo")
-	assert.Equal(t, "exit status 128", output)
+	assert.Equal(t, "fatal: not a git repository (or any of the parent directories): .git\n", output)
 }
 
 func Test_Add_Success(t *testing.T) {
@@ -338,6 +338,10 @@ func Test_AnyModified_Modified(t *testing.T) {
 		{
 			Source:      "",
 			Destination: "CHANGELOG",
+		},
+		{
+			Source:      "",
+			Destination: "239856bgv2983576gb2.txt",
 		},
 	}))
 }

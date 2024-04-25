@@ -90,3 +90,21 @@ func LogOutput(output bytes.Buffer) {
 	}
 	fmt.Print(output.String())
 }
+
+func RemoveFile(name string) error {
+	if err := os.Remove(name); err != nil {
+		return err
+	}
+	return nil
+}
+
+func RemoveFiles(files []config.File, workingDir string) error {
+	for _, f := range files {
+		filePath := filepath.Join(workingDir, f.Destination)
+		log.Debugf("Removing %s", filePath)
+		if err := RemoveFile(filePath); err != nil {
+			log.Errorf("error removing file %s: %s", filePath, err.Error())
+		}
+	}
+	return nil
+}

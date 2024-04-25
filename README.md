@@ -17,6 +17,7 @@ A GitHub Action which synchronizes files from another repository
 - Keep files across multiple repositories up to date automatically
 - Opens a pull request for file sync updates
 - Easily configurable
+- Optionally deletes files
 
 ## Example Usage
 
@@ -31,13 +32,15 @@ jobs:
 
       - uses: champ-oss/file-sync
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          repo: champ-oss/terraform-module-template
-          files: |
-            .gitignore
-            Makefile
-            templates/LICENSE-template=LICENSE
-            myworkflow.yml=.github/workflows/build.yml
+         token: ${{ secrets.GITHUB_TOKEN }}
+         repo: champ-oss/terraform-module-template
+         files: |
+          .gitignore
+          Makefile
+          templates/LICENSE-template=LICENSE
+          myworkflow.yml=.github/workflows/build.yml
+         delete-files: |
+          .github/workflows/old-workflow.yml
 ```
 
 ## Token
@@ -66,16 +69,17 @@ For example:
 
 
 ## Parameters
-| Parameter | Required | Description |
-| --- | --- | --- |
-| token | false | GitHub Token or PAT |
-| repo | true | Source GitHub repo |
-| files | true | List of files to sync |
-| target-branch | false | Target branch for pull request |
-| pull-request-branch | false | Branch to push changes |
-| user | false | Git username |
-| email | false | Git email |
-| commit-message | false | Updated by file-sync |
+| Parameter           | Required | Description                    |
+|---------------------|----------|--------------------------------|
+| token               | false    | GitHub Token or PAT            |
+| repo                | true     | Source GitHub repo             |
+| files               | true     | List of files to sync          |
+| target-branch       | false    | Target branch for pull request |
+| pull-request-branch | false    | Branch to push changes         |
+| user                | false    | Git username                   |
+| email               | false    | Git email                      |
+| commit-message      | false    | Updated by file-sync           |
+| delete-files        | false    | List of files to delete        |
 
 ## Contributing
 

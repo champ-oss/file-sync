@@ -60,7 +60,7 @@ func Checkout(repoDir, branchName string) error {
 func Status(repoDir, fileName string) string {
 	output, err := common.RunCommand(repoDir, "git", "status", "--porcelain", fileName)
 	if err != nil {
-		return err.Error()
+		log.Error(err)
 	}
 	return output
 }

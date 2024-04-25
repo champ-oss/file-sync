@@ -22,6 +22,7 @@ func main() {
 	user := config.GetUser()
 	email := config.GetEmail()
 	commitMsg := config.GetCommitMessage()
+	deleteFiles := config.GetDeleteFiles()
 
 	sourceDir, err := cli.CloneFromGitHub(sourceRepo, token)
 	if err != nil {
@@ -57,13 +58,17 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if modified := cli.AnyModified(workspace, files); !modified {
+	if err := common.RemoveFiles(deleteFiles, workspace); err != nil {
+		log.Fatal(err)
+	}
+
+	if modified := cli.AnyModified(workspace, append(files, deleteFiles...)); !modified {
 		log.Info("all files are up to date")
 	} else {
-		for _, f := range files {
+		for _, f := range append(files, deleteFiles...) {
 			err = cli.Add(workspace, f.Destination)
 			if err != nil {
-				panic(err)
+				log.Error(err)
 			}
 		}
 
