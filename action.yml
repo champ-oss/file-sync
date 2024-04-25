@@ -30,6 +30,9 @@ inputs:
     description: 'Commit message to use when updating files'
     required: false
     default: 'Updated by file-sync'
+  delete-files:
+    description: 'List of files to delete'
+    required: true
 
 runs:
   using: "composite"
@@ -46,3 +49,4 @@ runs:
         INPUT_USER: ${{ inputs.user }}
         INPUT_EMAIL: ${{ inputs.email }}
         INPUT_COMMIT_MESSAGE: ${{ inputs.commit-message }}
+        INPUT_DELETE_FILES: ${{ inputs.delete-files }}

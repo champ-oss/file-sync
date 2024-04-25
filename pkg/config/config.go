@@ -115,3 +115,20 @@ func getEnvOptional(key string) string {
 	log.Warningf("env variable %s is empty", key)
 	return ""
 }
+
+func GetDeleteFiles() []File {
+	value := getEnvRequired("INPUT_DELETE_FILES")
+	var files []File
+
+	for _, f := range strings.Split(value, "\n") {
+		if strings.TrimSpace(f) == "" {
+			continue
+		}
+		files = append(files, File{
+			Source:      strings.TrimSpace(f),
+			Destination: strings.TrimSpace(f),
+		})
+	}
+	log.Debugf("files to delete: %s", files)
+	return files
+}
