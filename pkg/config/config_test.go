@@ -130,3 +130,18 @@ func Test_getEnvRequired_Set(t *testing.T) {
 	_ = os.Setenv("TEST_KEY", "test123")
 	assert.Equal(t, "test123", getEnvRequired("TEST_KEY"))
 }
+
+func Test_GetDeleteFiles(t *testing.T) {
+	_ = os.Setenv("INPUT_DELETE_FILES", "file1\nfile2")
+	expected := []File{
+		{
+			Source:      "file1",
+			Destination: "file1",
+		},
+		{
+			Source:      "file2",
+			Destination: "file2",
+		},
+	}
+	assert.Equal(t, expected, GetDeleteFiles())
+}

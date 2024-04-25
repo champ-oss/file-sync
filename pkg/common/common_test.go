@@ -151,3 +151,26 @@ func Test_LogOutput_Empty(t *testing.T) {
 		LogOutput(test)
 	})
 }
+
+func Test_RemoveFile(t *testing.T) {
+	err := os.WriteFile("test.txt", []byte("test"), 0666)
+	assert.NoError(t, err)
+	assert.NotPanics(t, func() {
+		err := RemoveFile("test.txt")
+		assert.NoError(t, err)
+	})
+}
+
+func Test_RemoveFiles(t *testing.T) {
+	err := os.WriteFile("test.txt", []byte("test"), 0666)
+	assert.NoError(t, err)
+	assert.NotPanics(t, func() {
+		err := RemoveFiles([]config.File{
+			{
+				Source:      "test.txt",
+				Destination: "test.txt",
+			},
+		}, ".")
+		assert.NoError(t, err)
+	})
+}
