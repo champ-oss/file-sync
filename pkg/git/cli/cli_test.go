@@ -121,9 +121,8 @@ func Test_Status_Clean(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	output, err := Status(repoDir, "foo")
+	output := Status(repoDir, "foo")
 	assert.Equal(t, "", output)
-	assert.NoError(t, err)
 }
 
 func Test_Status_Modified(t *testing.T) {
@@ -134,19 +133,16 @@ func Test_Status_Modified(t *testing.T) {
 	}
 
 	err = os.WriteFile(filepath.Join(repoDir, "LICENSE"), []byte("test"), 0644)
-	assert.NoError(t, err)
-
-	output, err := Status(repoDir, "LICENSE")
+	output := Status(repoDir, "LICENSE")
 	assert.Equal(t, " M LICENSE\n", output)
-	assert.NoError(t, err)
+	assert.Nil(t, err)
 }
 
 func Test_Status_Error(t *testing.T) {
 	repoDir, _ := CloneFromGitHub(fixtureGitRepoInvalid, token)
 	defer common.RemoveDir(repoDir)
 
-	output, err := Status(repoDir, "foo")
-	assert.Equal(t, "exit status 128", err.Error())
+	output := Status(repoDir, "foo")
 	assert.Equal(t, "", output)
 }
 
@@ -165,9 +161,8 @@ func Test_Add_Success(t *testing.T) {
 	err = Add(repoDir, "LICENSE")
 	assert.Nil(t, err)
 
-	output, err := Status(repoDir, "LICENSE")
+	output := Status(repoDir, "LICENSE")
 	assert.Equal(t, "M  LICENSE\n", output)
-	assert.NoError(t, err)
 }
 
 func Test_Add_Error(t *testing.T) {
