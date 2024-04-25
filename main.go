@@ -65,10 +65,10 @@ func main() {
 	if modified := cli.AnyModified(workspace, append(files, deleteFiles...)); !modified {
 		log.Info("all files are up to date")
 	} else {
-		for _, f := range files {
+		for _, f := range append(files, deleteFiles...) {
 			err = cli.Add(workspace, f.Destination)
 			if err != nil {
-				panic(err)
+				log.Error(err)
 			}
 		}
 
