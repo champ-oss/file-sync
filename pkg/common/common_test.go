@@ -174,3 +174,15 @@ func Test_RemoveFiles(t *testing.T) {
 		assert.NoError(t, err)
 	})
 }
+
+func Test_RemoveFiles_Error(t *testing.T) {
+	assert.NotPanics(t, func() {
+		err := RemoveFiles([]config.File{
+			{
+				Source:      "249857g6b2398bv5.txt",
+				Destination: "249857g6b2398bv5.txt",
+			},
+		}, ".")
+		assert.NoError(t, err)
+	})
+}
