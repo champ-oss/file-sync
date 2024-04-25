@@ -57,17 +57,21 @@ func Checkout(repoDir, branchName string) error {
 	return nil
 }
 
-func Status(repoDir, fileName string) string {
+func Status(repoDir, fileName string) (string, error) {
 	output, err := common.RunCommand(repoDir, "git", "status", "--porcelain", fileName)
 	if err != nil {
-		return err.Error()
+		return "", err
 	}
-	return output
+	return output, nil
 }
 
 func AnyModified(repoDir string, files []config.File) bool {
 	for _, f := range files {
-		if status := Status(repoDir, f.Destination); status != "" {
+		status, err := Status(repoDir, f.Destination)
+		if err != nil {
+			log.Error(err)
+		}
+		if status != "" {
 			return true
 		}
 	}
