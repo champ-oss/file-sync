@@ -1,15 +1,13 @@
-name: sync
-
 on:
   workflow_dispatch:
   schedule:
-   - cron: "0 * * * *"
+    - cron: "0 * * * *"
 
 jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.1.2
         with:
           token: ${{ secrets.ACTION_TOKEN }}
       - uses: champ-oss/file-sync@main
@@ -22,5 +20,4 @@ jobs:
             .tflint.hcl
             .github/CODEOWNERS
             .github/dependabot.yml
-            .github/workflows/lint.yml
             .github/workflows/release.yml
