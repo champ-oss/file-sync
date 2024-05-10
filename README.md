@@ -29,18 +29,21 @@ jobs:
       - uses: actions/checkout@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-
-      - uses: champ-oss/file-sync
+      - uses: champ-oss/file-sync@main
         with:
          token: ${{ secrets.GITHUB_TOKEN }}
-         repo: champ-oss/terraform-module-template
+         source-repo: champ-oss/terraform-module-template
+         destination-repos: |
+           champ-oss/repo1
+           champ-oss/repo2
+         destination-repos-regex: champ-oss/terraform-.*
          files: |
-          .gitignore
-          Makefile
-          templates/LICENSE-template=LICENSE
-          myworkflow.yml=.github/workflows/build.yml
+           .gitignore
+           Makefile
+           templates/LICENSE-template=LICENSE
+           myworkflow.yml=.github/workflows/build.yml
          delete-files: |
-          .github/workflows/old-workflow.yml
+           .github/workflows/old-workflow.yml
 ```
 
 ## Token
@@ -50,6 +53,18 @@ By default the `GITHUB_TOKEN` should be passed to the `actions/checkout` step as
 
 If you are syncing workflow files (`.github/workflows`) then you will need to generate and use a Personal Access Token (PAT) with `repo` and `workflow` permissions. 
 
+## Destination Repos
+
+The destination repositories to sync to can be specified as a list using the `destination-repos` parameter.
+Alternatively, you can use a regex to match multiple destination repositories using the `destination-repos-regex`
+parameter.
+If both parameters are specified then they will be combined. If neither parameters are specified then the repository
+where the action
+is running will be used as the destination.
+
+Note: The `destination-repos-regex` parameter works by scanning the GitHub organization for repositories that match the
+regex.
+This means all the destination repositories must be in the same organization.
 
 ## File list
 One file should be specified per-line. You can specify the file in the format `<source_path>=<destination_path`. The paths are relative to the root of the source and destination repositories. 
@@ -69,17 +84,20 @@ For example:
 
 
 ## Parameters
-| Parameter           | Required | Description                    |
-|---------------------|----------|--------------------------------|
-| token               | false    | GitHub Token or PAT            |
-| repo                | true     | Source GitHub repo             |
-| files               | true     | List of files to sync          |
-| target-branch       | false    | Target branch for pull request |
-| pull-request-branch | false    | Branch to push changes         |
-| user                | false    | Git username                   |
-| email               | false    | Git email                      |
-| commit-message      | false    | Updated by file-sync           |
-| delete-files        | false    | List of files to delete        |
+
+| Parameter               | Required | Description                      |
+|-------------------------|----------|----------------------------------|
+| token                   | false    | GitHub Token or PAT              |
+| source-repo             | true     | Source GitHub repo               |
+| destination-repos       | false    | List of destination repos        |
+| destination-repos-regex | false    | Regex to match destination repos |
+| files                   | true     | List of files to sync            |
+| delete-files            | false    | List of files to delete          |
+| target-branch           | false    | Target branch for pull request   |
+| pull-request-branch     | false    | Branch to push changes           |
+| user                    | false    | Git username                     |
+| email                   | false    | Git email                        |
+| commit-message          | false    | Updated by file-sync             |
 
 ## Contributing
 
