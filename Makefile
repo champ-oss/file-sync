@@ -24,3 +24,6 @@ test:
 venv:
 	python3 -m venv venv
 	. ./venv/bin/activate
+
+run:
+	python3 main.py
