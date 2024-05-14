@@ -86,3 +86,30 @@ class GitHubUtil:
         logger.warning(f'{destination_repo.name}: file needs to be updated '
                        f'on {branch} branch: {source_file.destination_path}')
         return False
+
+    @staticmethod
+    def update_file(destination_repo: Repository, sync_file: FileConfig, branch: str) -> None:
+        """
+        Update the file in the destination repository, or create a new file if it does not exist.
+
+        :param destination_repo: repository containing the file to update
+        :param sync_file: file to update
+        :param branch: branch to push changes
+        :return: None
+        """
+        try:
+            destination_file = destination_repo.get_contents(sync_file.destination_path, ref=branch)
+            logger.info(f'{destination_repo.name}: updating file: {sync_file.destination_path}')
+            destination_repo.update_file(path=sync_file.destination_path,
+                                         message='Updated by file-sync',
+                                         content=sync_file.content,
+                                         sha=destination_file.sha,
+                                         branch=branch)
+
+        except (UnknownObjectException, GithubException) as e:
+            logger.debug(e)
+            logger.info(f'{destination_repo.name}: creating file: {sync_file.destination_path}')
+            destination_repo.create_file(path=sync_file.destination_path,
+                                         message='Updated by file-sync',
+                                         content=sync_file.content,
+                                         branch=branch)

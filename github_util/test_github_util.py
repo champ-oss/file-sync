@@ -73,3 +73,25 @@ class TestGitHubUtil(unittest.TestCase):
         destination_repo = MagicMock()
         destination_repo.get_contents.side_effect = GithubException(status=404, data={'message': 'File not found'}),
         self.assertFalse(self.github_util.is_file_up_to_date(MagicMock(), destination_repo, branch='main'))
+
+    def test_update_file_should_update_existing_file(self: Self) -> None:
+        """Validate the update_file function is successful."""
+        source_file = FileConfig(source_path='', destination_path='foo', content=b'foo')
+        destination_repo = MagicMock()
+        destination_repo.get_contents.return_value.sha = '456'
+        self.github_util.update_file(destination_repo, source_file, branch='main')
+        destination_repo.update_file.assert_called_once()
+        destination_repo.update_file.assert_called_with(
+            path='foo', message='Updated by file-sync', content=b'foo', sha='456', branch='main'
+        )
+
+    def test_update_file_should_create_a_new_file(self: Self) -> None:
+        """Validate the update_file function is successful."""
+        source_file = FileConfig(source_path='', destination_path='foo', content=b'foo')
+        destination_repo = MagicMock()
+        destination_repo.get_contents.side_effect = UnknownObjectException(404)
+        self.github_util.update_file(destination_repo, source_file, branch='main')
+        destination_repo.create_file.assert_called_once()
+        destination_repo.create_file.assert_called_with(
+            path='foo', message='Updated by file-sync', content=b'foo', branch='main'
+        )
