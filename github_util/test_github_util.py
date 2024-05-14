@@ -112,3 +112,24 @@ class TestGitHubUtil(unittest.TestCase):
         repo.create_pull.assert_called_with(
             title='file-sync', head='test-branch', base='main'
         )
+
+    def test_get_sync_files_from_source_repo(self: Self) -> None:
+        template_file = MagicMock()
+        template_file.sha = '123'
+        template_file.content = 'Zm9vCg=='
+
+        source_repo = MagicMock()
+        source_repo.get_contents.return_value = template_file
+        self.github_session.get_repo.return_value = source_repo
+
+        sync_files = self.github_util.get_sync_files_from_source_repo(
+            source_repo_name='my-org/test-repo-1', action_input_files='foo/bar.yml', source_branch='main'
+        )
+        expected = [FileConfig(source_path='foo/bar.yml', destination_path='foo/bar.yml', content=b'foo\n', sha='123')]
+        self.assertEqual(expected, sync_files)
+
+        self.github_session.get_repo.assert_called_once()
+        self.github_session.get_repo.assert_called_with('my-org/test-repo-1')
+
+        source_repo.get_contents.assert_called_once()
+        source_repo.get_contents.assert_called_with('foo/bar.yml', ref='main')

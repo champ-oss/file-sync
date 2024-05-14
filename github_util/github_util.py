@@ -1,4 +1,5 @@
 """Provides functionality for interfacing with GitHub repositories."""
+import base64
 import logging
 from typing import Optional
 
@@ -6,6 +7,7 @@ from github import Github, Auth, UnknownObjectException, GithubException
 from github.Repository import Repository
 from typing_extensions import Self
 
+from config_util.config_util import ConfigUtil
 from config_util.file_config import FileConfig
 
 logger = logging.getLogger(__name__)
@@ -129,3 +131,25 @@ class GitHubUtil:
             logger.info(f'{destination_repo.name}: created pull request: {pull_request.html_url}')
         except GithubException as e:
             logger.debug(e)
+
+    def get_sync_files_from_source_repo(self: Self, source_repo_name: str, action_input_files: str,
+                                        source_branch: str = 'main') -> list[FileConfig]:
+        """
+        Get the list of files to sync from the source repository.
+
+        :param source_repo_name: name of the source repository
+        :param action_input_files: string of input files from the GitHub action
+        :param source_branch: name of the branch to sync files from (default: main)
+        :return: list of files to sync
+        """
+        source_repo = self.github_session.get_repo(source_repo_name)
+        sync_files = ConfigUtil.parse_files_config_from_input(action_input_files)
+
+        for sync_file in sync_files:
+            template_file = source_repo.get_contents(sync_file.source_path, ref=source_branch)
+            sync_file.sha = template_file.sha
+            sync_file.content = base64.b64decode(template_file.content)
+            logger.info(
+                f'loaded source file: {sync_file.source_path} sha:{sync_file.sha} bytes:{len(sync_file.content)}')
+
+        return sync_files
