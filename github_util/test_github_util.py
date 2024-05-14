@@ -134,5 +134,59 @@ class TestGitHubUtil(unittest.TestCase):
         self.github_util.repository.get_contents.assert_called_once()
         self.github_util.repository.get_contents.assert_called_with('foo/bar.yml', ref='main')
 
-    def test_sync_files_for_repo(self: Self) -> None:
-        pass
+    def test_sync_files_for_repo_when_already_up_to_date_on_main_branch(self: Self) -> None:
+        """Validate the sync_files_for_repo function is successful."""
+        self.github_util.repository = MagicMock()
+        self.github_util._is_file_up_to_date = MagicMock()
+        self.github_util._is_file_up_to_date.side_effect = [
+            True  # file is up-to-date on main branch
+        ]
+        self.github_util._create_branch_if_not_exists = MagicMock()
+        self.github_util._update_file = MagicMock()
+
+        self.github_util.sync_files_for_repo(
+            [FileConfig(source_path='foo/bar.yml', destination_path='foo/bar.yml', content=b'foo\n', sha='123')]
+        )
+        self.github_util._is_file_up_to_date.assert_called_once()
+        self.github_util._create_branch_if_not_exists.assert_not_called()
+        self.github_util._update_file.assert_not_called()
+
+    def test_sync_files_for_repo_when_already_up_to_date_on_file_sync_branch(self: Self) -> None:
+        """Validate the sync_files_for_repo function is successful."""
+        self.github_util.repository = MagicMock()
+        self.github_util._is_file_up_to_date = MagicMock()
+        self.github_util._is_file_up_to_date.side_effect = [
+            False,  # file is not up-to-date on main branch
+            True  # file is up-to-date on file-sync branch
+        ]
+        self.github_util._create_branch_if_not_exists = MagicMock()
+        self.github_util._update_file = MagicMock()
+
+        self.github_util.sync_files_for_repo(
+            [FileConfig(source_path='foo/bar.yml', destination_path='foo/bar.yml', content=b'foo\n', sha='123')]
+        )
+        self.github_util._create_branch_if_not_exists.assert_called_once()
+        self.github_util._create_branch_if_not_exists.assert_called_with('file-sync')
+        self.github_util._update_file.assert_not_called()
+
+    def test_sync_files_for_repo_when_not_up_to_date(self: Self) -> None:
+        """Validate the sync_files_for_repo function is successful."""
+        self.github_util.repository = MagicMock()
+        self.github_util._is_file_up_to_date = MagicMock()
+        self.github_util._is_file_up_to_date.side_effect = [
+            False,  # file is not up-to-date on main branch
+            False  # file is not up-to-date on file-sync branch
+        ]
+        self.github_util._create_branch_if_not_exists = MagicMock()
+        self.github_util._update_file = MagicMock()
+
+        self.github_util.sync_files_for_repo(
+            [FileConfig(source_path='foo/bar.yml', destination_path='foo/bar.yml', content=b'foo\n', sha='123')]
+        )
+        self.github_util._create_branch_if_not_exists.assert_called_once()
+        self.github_util._create_branch_if_not_exists.assert_called_with('file-sync')
+        self.github_util._update_file.assert_called_once()
+        self.github_util._update_file.assert_called_with(
+            FileConfig(source_path='foo/bar.yml', destination_path='foo/bar.yml', content=b'foo\n', sha='123'),
+            branch='file-sync'
+        )

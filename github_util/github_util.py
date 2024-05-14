@@ -30,6 +30,7 @@ class GitHubUtil:
 
         else:
             self.github_session = github_session
+            self.repository = None
 
     @staticmethod
     def _get_repo(github_session: Github, repository_name: str) -> Optional[Repository]:
@@ -43,7 +44,7 @@ class GitHubUtil:
         try:
             return github_session.get_repo(repository_name)
         except (UnknownObjectException, GithubException) as e:
-            logger.error(f'unable to find repository: {repository_name} error:{e}')
+            logger.warning(f'unable to find repository: {repository_name} error:{e}')
             return None
 
     def get_sync_files_from_source_repo(self: Self, action_input_files: str,
@@ -77,7 +78,7 @@ class GitHubUtil:
         :return: None
         """
         if not self.repository:
-            return None
+            return
 
         for sync_file in sync_files:
             if self._is_file_up_to_date(sync_file, branch='main'):
