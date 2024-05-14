@@ -26,11 +26,10 @@ class GitHubUtil:
         if not github_session:
             logger.debug('logging in to GitHub using access token')
             self.github_session = Github(auth=Auth.Token(access_token))
-            self.repository = self._get_repo(self.github_session, repository_name)
+            self.repository: Repository = self._get_repo(self.github_session, repository_name)
 
         else:
             self.github_session = github_session
-            self.repository = None
 
     @staticmethod
     def _get_repo(github_session: Github, repository_name: str) -> Optional[Repository]:
@@ -65,7 +64,7 @@ class GitHubUtil:
             template_file = self.repository.get_contents(sync_file.source_path, ref=branch)
             sync_file.sha = template_file.sha
             sync_file.content = base64.b64decode(template_file.content)
-            logger.info(f'loaded source file: {sync_file.source_path} sha:{sync_file.sha} '
+            logger.info(f'{self.repository.name}: loaded source file: {sync_file.source_path} sha:{sync_file.sha} '
                         f'bytes:{len(sync_file.content)}')
 
         return sync_files
@@ -80,6 +79,7 @@ class GitHubUtil:
         if not self.repository:
             return
 
+        logger.info(f'{self.repository.name}: starting sync process')
         for sync_file in sync_files:
             if self._is_file_up_to_date(sync_file, branch='main'):
                 continue
@@ -159,16 +159,23 @@ class GitHubUtil:
                                         content=sync_file.content,
                                         branch=branch)
 
-    def _create_pull_request(self: Self, head_branch: str, base_branch: str = 'main') -> None:
+    def create_pull_request(self: Self, head_branch: str, base_branch: str = 'main', draft: bool = False) -> None:
         """
         Create a pull request on the destination repository.
 
         :param head_branch: source branch for the pull request
         :param base_branch: target branch for the pull request (default: main)
+        :param draft: create a draft pull request (default: False)
         :return:
         """
+        if not self.repository:
+            return
+
         try:
-            pull_request = self.repository.create_pull(title='file-sync', head=head_branch, base=base_branch)
+            pull_request = self.repository.create_pull(title='file-sync',
+                                                       head=head_branch,
+                                                       base=base_branch,
+                                                       draft=draft)
             logger.info(f'{self.repository.name}: created pull request: {pull_request.html_url}')
         except GithubException as e:
             logger.debug(e)
