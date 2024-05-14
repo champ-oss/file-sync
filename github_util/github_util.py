@@ -37,3 +37,24 @@ class GitHubUtil:
         except (UnknownObjectException, GithubException) as e:
             logger.warning(f'unable to find repository: {repo_name} error:{e}')
             return None
+
+    @staticmethod
+    def create_branch_if_not_exists(repo: Repository, branch_name: str, source_branch: str = 'main') -> None:
+        """
+        Create a branch on the repository if it does not already exist.
+
+        :param repo: repository to create branch
+        :param branch_name: name of the branch to create
+        :param source_branch: source of the new branch (default: main)
+        :return: None
+        """
+        try:
+            branch = repo.get_branch(branch_name)
+            if branch:
+                return
+        except GithubException as e:
+            logger.debug(e)
+
+        logger.info(f'{repo.name}: creating {branch_name} branch')
+        source_sha = repo.get_branch(source_branch).commit.sha
+        repo.create_git_ref(ref=f'refs/heads/{branch_name}', sha=source_sha)
