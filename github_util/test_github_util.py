@@ -95,3 +95,20 @@ class TestGitHubUtil(unittest.TestCase):
         destination_repo.create_file.assert_called_with(
             path='foo', message='Updated by file-sync', content=b'foo', branch='main'
         )
+
+    def test_create_pull_request(self: Self) -> None:
+        """Validate the create_pull_request function is successful."""
+        repo = MagicMock()
+        self.github_util.create_pull_request(repo, 'test-branch')
+        repo.create_pull.assert_called_once()
+        repo.create_pull.assert_called_with(
+            title='file-sync', head='test-branch', base='main'
+        )
+
+        repo = MagicMock()
+        repo.create_pull.side_effect = GithubException(status=422, data={'message': 'Invalid request'})
+        self.github_util.create_pull_request(repo, 'test-branch')
+        repo.create_pull.assert_called_once()
+        repo.create_pull.assert_called_with(
+            title='file-sync', head='test-branch', base='main'
+        )

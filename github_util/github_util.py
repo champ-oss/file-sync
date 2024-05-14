@@ -113,3 +113,19 @@ class GitHubUtil:
                                          message='Updated by file-sync',
                                          content=sync_file.content,
                                          branch=branch)
+
+    @staticmethod
+    def create_pull_request(destination_repo: Repository, head_branch: str, base_branch: str = 'main') -> None:
+        """
+        Create a pull request on the destination repository.
+
+        :param destination_repo: repository to create the pull request
+        :param head_branch: source branch for the pull request
+        :param base_branch: target branch for the pull request (default: main)
+        :return:
+        """
+        try:
+            pull_request = destination_repo.create_pull(title='file-sync', head=head_branch, base=base_branch)
+            logger.info(f'{destination_repo.name}: created pull request: {pull_request.html_url}')
+        except GithubException as e:
+            logger.debug(e)
