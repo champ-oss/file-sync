@@ -114,6 +114,7 @@ class TestGitHubUtil(unittest.TestCase):
         )
 
     def test_get_sync_files_from_source_repo(self: Self) -> None:
+        """Validate the get_sync_files_from_source_repo function is successful."""
         template_file = MagicMock()
         template_file.sha = '123'
         template_file.content = 'Zm9vCg=='
