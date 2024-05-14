@@ -6,6 +6,8 @@ from github import Github, Auth, UnknownObjectException, GithubException
 from github.Repository import Repository
 from typing_extensions import Self
 
+from config_util.file_config import FileConfig
+
 logger = logging.getLogger(__name__)
 
 
@@ -52,9 +54,35 @@ class GitHubUtil:
             branch = repo.get_branch(branch_name)
             if branch:
                 return
-        except GithubException as e:
+        except (UnknownObjectException, GithubException) as e:
             logger.debug(e)
 
         logger.info(f'{repo.name}: creating {branch_name} branch')
         source_sha = repo.get_branch(source_branch).commit.sha
         repo.create_git_ref(ref=f'refs/heads/{branch_name}', sha=source_sha)
+
+    @staticmethod
+    def is_file_up_to_date(source_file: FileConfig, destination_repo: Repository, branch: str) -> bool:
+        """
+        Check if the source file is up-to-date in the destination repository by comparing the SHA.
+
+        :param source_file: source file to check
+        :param destination_repo: repo where the file should be updated
+        :param branch: which branch the file should be checked
+        :return: true if the file is up-to-date, false if it needs to be updated
+        """
+        try:
+            logger.info(f'{destination_repo.name}: checking file: {source_file.destination_path}')
+            destination_file = destination_repo.get_contents(source_file.destination_path, ref=branch)
+        except (UnknownObjectException, GithubException) as e:
+            logger.debug(e)
+            return False
+
+        if destination_file.sha == source_file.sha:
+            logger.info(f'{destination_repo.name}: file is already up to date '
+                        f'on {branch} branch: {source_file.destination_path}')
+            return True
+
+        logger.warning(f'{destination_repo.name}: file needs to be updated '
+                       f'on {branch} branch: {source_file.destination_path}')
+        return False

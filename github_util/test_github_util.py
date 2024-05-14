@@ -5,6 +5,7 @@ from unittest.mock import MagicMock
 from github import UnknownObjectException, GithubException
 from typing_extensions import Self
 
+from config_util.file_config import FileConfig
 from github_util.github_util import GitHubUtil
 
 
@@ -46,3 +47,29 @@ class TestGitHubUtil(unittest.TestCase):
         repo.get_branch.return_value = 'test-branch'
         self.github_util.create_branch_if_not_exists(repo=repo, branch_name='test-branch')
         repo.create_git_ref.assert_not_called()
+
+    def test_is_file_up_to_date_should_return_true(self: Self) -> None:
+        """Validate the is_file_up_to_date function is successful."""
+        source_file = FileConfig(source_path='', destination_path='foo', sha='123')
+        destination_repo = MagicMock()
+        destination_repo.get_contents.return_value.sha = '123'
+        self.assertTrue(self.github_util.is_file_up_to_date(source_file, destination_repo, branch='main'))
+        destination_repo.get_contents.assert_called_with('foo', ref='main')
+
+    def test_is_file_up_to_date_should_return_false(self: Self) -> None:
+        """Validate the is_file_up_to_date function is successful."""
+        source_file = FileConfig(source_path='', destination_path='foo', sha='123')
+        destination_repo = MagicMock()
+        destination_repo.get_contents.return_value.sha = '456'
+        self.assertFalse(self.github_util.is_file_up_to_date(source_file, destination_repo, branch='main'))
+        destination_repo.get_contents.assert_called_with('foo', ref='main')
+
+    def test_is_file_up_to_date_should_return_false_when_file_not_found(self: Self) -> None:
+        """Validate the is_file_up_to_date function is successful."""
+        destination_repo = MagicMock()
+        destination_repo.get_contents.side_effect = UnknownObjectException(404)
+        self.assertFalse(self.github_util.is_file_up_to_date(MagicMock(), destination_repo, branch='main'))
+
+        destination_repo = MagicMock()
+        destination_repo.get_contents.side_effect = GithubException(status=404, data={'message': 'File not found'}),
+        self.assertFalse(self.github_util.is_file_up_to_date(MagicMock(), destination_repo, branch='main'))
