@@ -4,10 +4,10 @@ inputs:
   token:
     description: 'GitHub Token or PAT'
     required: true
-  source-repo:
+  repo:
     description: 'Source GitHub repo'
     required: true
-  source-repo-branch:
+  repo-branch:
     description: 'Source GitHub repo branch name'
     required: false
     default: 'main'
@@ -22,7 +22,7 @@ inputs:
     required: true
   delete-files:
     description: 'List of files to delete'
-    required: true
+    required: false
   target-branch:
     description: 'Target branch for pull request'
     required: false
@@ -67,8 +67,8 @@ runs:
       working-directory: ${{ inputs.working-directory }}
       env:
         INPUT_TOKEN: ${{ inputs.token }}
-        INPUT_SOURCE_REPO: ${{ inputs.source-repo }}
-        INPUT_SOURCE_REPO_BRANCH: ${{ inputs.source-repo-branch }}
+        INPUT_SOURCE_REPO: ${{ inputs.repo }}
+        INPUT_SOURCE_REPO_BRANCH: ${{ inputs.repo-branch }}
         INPUT_DESTINATION_REPOS: ${{ inputs.destination-repos }}
         INPUT_DESTINATION_REPOS_REGEX: ${{ inputs.destination-repos-regex }}
         INPUT_FILES: ${{ inputs.files }}
@@ -79,3 +79,4 @@ runs:
         INPUT_USER: ${{ inputs.user }}
         INPUT_EMAIL: ${{ inputs.email }}
         INPUT_COMMIT_MESSAGE: ${{ inputs.commit-message }}
+        INPUT_CURRENT_REPOSITORY: ${{ github.repository }}
