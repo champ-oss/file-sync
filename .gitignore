@@ -49,4 +49,3 @@ override.tf.json
 # Python
 venv/
 .coverage
-coverage.xml
