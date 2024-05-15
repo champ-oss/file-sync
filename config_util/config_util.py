@@ -1,5 +1,6 @@
 """Provides functionality for loading configuration options."""
 import logging
+import os
 
 from config_util.file_config import FileConfig
 
@@ -48,3 +49,38 @@ class ConfigUtil:
                 continue
             results.append(line.strip())
         return results
+
+    @staticmethod
+    def token() -> str:
+        """Load the config value from the environment variables."""
+        return os.getenv('INPUT_TOKEN')
+
+    @staticmethod
+    def source_repo_name() -> str:
+        """Load the config value from the environment variables."""
+        return os.getenv('INPUT_SOURCE_REPO')
+
+    @staticmethod
+    def source_repo_branch() -> str:
+        """Load the config value from the environment variables."""
+        return os.getenv('INPUT_SOURCE_REPO_BRANCH')
+
+    @staticmethod
+    def files() -> str:
+        """Load the config value from the environment variables."""
+        return os.getenv('INPUT_FILES')
+
+    @staticmethod
+    def destination_repos() -> str:
+        """Load the config value from the environment variables."""
+        return os.getenv('INPUT_DESTINATION_REPOS')
+
+    @staticmethod
+    def pull_request_draft() -> bool:
+        """Load the config value from the environment variables."""
+        return os.getenv('INPUT_PULL_REQUEST_DRAFT', 'false').lower() == 'true'
+
+    @staticmethod
+    def pull_request_branch() -> str:
+        """Load the config value from the environment variables."""
+        return os.getenv('INPUT_PULL_REQUEST_BRANCH')
