@@ -73,7 +73,10 @@ class ConfigUtil:
     @staticmethod
     def destination_repos() -> str:
         """Load the config value from the environment variables."""
-        return os.getenv('INPUT_DESTINATION_REPOS')
+        if os.getenv('INPUT_DESTINATION_REPOS'):
+            return os.getenv('INPUT_DESTINATION_REPOS')
+
+        return os.getenv('INPUT_CURRENT_REPOSITORY')
 
     @staticmethod
     def pull_request_draft() -> bool:

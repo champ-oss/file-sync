@@ -65,6 +65,10 @@ class TestConfigUtil(unittest.TestCase):
         os.environ['INPUT_DESTINATION_REPOS'] = 'test1\btest2'
         self.assertEqual('test1\btest2', ConfigUtil.destination_repos())
 
+        os.environ['INPUT_DESTINATION_REPOS'] = ''
+        os.environ['INPUT_CURRENT_REPOSITORY'] = 'foo1'
+        self.assertEqual('foo1', ConfigUtil.destination_repos())
+
         os.environ['INPUT_PULL_REQUEST_DRAFT'] = 'true'
         self.assertEqual(True, ConfigUtil.pull_request_draft())
 
