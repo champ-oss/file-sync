@@ -2,7 +2,6 @@ name: test
 
 on:
   workflow_dispatch:
-  push:
   pull_request:
 
 env:
@@ -58,6 +57,9 @@ jobs:
   file-sync:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          path: 'test'
       - uses: ./
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
