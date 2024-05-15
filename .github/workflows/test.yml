@@ -55,3 +55,15 @@ jobs:
             -Dsonar.pullrequest.branch=${{ github.HEAD_REF }}
             -Dsonar.pullrequest.base=${{ github.BASE_REF }}
             -Dsonar.python.coverage.reportPaths=coverage.xml
+  file-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repo: 'champ-oss/file-sync'
+          repo-branch: 'sync-test'
+          pull-request-draft: 'true'
+          files: |
+            LICENSE
