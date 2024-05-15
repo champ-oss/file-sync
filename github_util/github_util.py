@@ -64,8 +64,8 @@ class GitHubUtil:
             template_file = self.repository.get_contents(sync_file.source_path, ref=branch)
             sync_file.sha = template_file.sha
             sync_file.content = base64.b64decode(template_file.content)
-            logger.info(f'{self.repository.name}: loaded source file: {sync_file.source_path} sha:{sync_file.sha} '
-                        f'bytes:{len(sync_file.content)}')
+            logger.info(f'{self.repository.name}: loaded source file: {sync_file.source_path} branch:{branch} '
+                        f'sha:{sync_file.sha} bytes:{len(sync_file.content)}')
 
         return sync_files
 
