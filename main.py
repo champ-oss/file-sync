@@ -17,7 +17,6 @@ def main() -> None:
 
     :return: None
     """
-
     source_repo = GitHubUtil(access_token=Config.token(), repository_name=Config.source_repo_name())
 
     sync_files = source_repo.get_sync_files_from_source_repo(action_input_files=Config.files(),

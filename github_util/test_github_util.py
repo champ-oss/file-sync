@@ -106,7 +106,7 @@ class TestGitHubUtil(unittest.TestCase):
         self.github_util.create_pull_request('test-branch')
         self.github_util.repository.create_pull.assert_called_once()
         self.github_util.repository.create_pull.assert_called_with(
-            title='file-sync', head='test-branch', base='main'
+            title='file-sync', head='test-branch', base='main', draft=False
         )
 
         self.github_util.repository = MagicMock()
@@ -115,7 +115,7 @@ class TestGitHubUtil(unittest.TestCase):
         self.github_util.create_pull_request('test-branch')
         self.github_util.repository.create_pull.assert_called_once()
         self.github_util.repository.create_pull.assert_called_with(
-            title='file-sync', head='test-branch', base='main'
+            title='file-sync', head='test-branch', base='main', draft=False
         )
 
     def test_get_sync_files_from_source_repo(self: Self) -> None:
