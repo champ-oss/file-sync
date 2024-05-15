@@ -4,6 +4,10 @@ on:
   workflow_dispatch:
   push:
 
+env:
+  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  SONAR_HOST_URL: https://sonarcloud.io
+
 jobs:
   test:
     runs-on: ubuntu-latest
