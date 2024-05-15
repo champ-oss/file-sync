@@ -119,15 +119,15 @@ class GitHubUtil:
         :return: true if the file is up-to-date, false if it needs to be updated
         """
         try:
-            logger.info(f'{self.repository.name}: checking file: {source_file.destination_path}')
+            logger.debug(f'{self.repository.name}: checking file: {source_file.destination_path}')
             destination_file = self.repository.get_contents(source_file.destination_path, ref=branch)
         except (UnknownObjectException, GithubException) as e:
             logger.debug(e)
             return False
 
         if destination_file.sha == source_file.sha:
-            logger.info(f'{self.repository.name}: file is already up to date '
-                        f'on {branch} branch: {source_file.destination_path}')
+            logger.debug(f'{self.repository.name}: file is already up to date '
+                         f'on {branch} branch: {source_file.destination_path}')
             return True
 
         logger.warning(f'{self.repository.name}: file needs to be updated '
