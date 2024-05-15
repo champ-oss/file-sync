@@ -58,7 +58,6 @@ jobs:
   file-sync:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
       - uses: ./
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
