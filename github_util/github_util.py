@@ -65,10 +65,14 @@ class GitHubUtil:
 
         for repo_regex in repo_regex_patterns:
             org_name, pattern = GitHubUtil._get_org_and_repo_pattern_from_regex(repo_regex)
+            logger.info(f'getting repositories for org: {org_name} with pattern: {pattern.pattern}')
             for repo in github_session.get_organization(org_name).get_repos():
+                if repo.archived:
+                    continue
                 if pattern.match(repo.name):
                     repo_list.append(f'{org_name}/{repo.name}')
 
+        logger.info(f'repositories found: {repo_list}')
         return repo_list
 
     @staticmethod
