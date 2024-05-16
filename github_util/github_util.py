@@ -91,7 +91,7 @@ class GitHubUtil:
 
             self._update_file(sync_file, branch='file-sync')
 
-    def delete_files_for_repo(self, delete_files: list[FileConfig]) -> None:
+    def delete_files_for_repo(self: Self, delete_files: list[FileConfig]) -> None:
         """
         Delete the list of files in the repository.
 
@@ -103,11 +103,12 @@ class GitHubUtil:
 
         for delete_file in delete_files:
             try:
-                file = self.repository.get_contents(delete_file.destination_path, ref='main')
-                self.repository.delete_file(path=delete_file.destination_path,
-                                            message='Deleted by file-sync',
-                                            sha=file.sha,
-                                            branch='file-sync')
+                self.repository.delete_file(
+                    path=delete_file.destination_path,
+                    message='Deleted by file-sync',
+                    sha=self.repository.get_contents(delete_file.destination_path, ref='main').sha,
+                    branch='file-sync'
+                )
                 logger.info(f'{self.repository.name}: deleted file: {delete_file.destination_path}')
 
             except (UnknownObjectException, GithubException) as e:
