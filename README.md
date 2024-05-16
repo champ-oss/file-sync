@@ -32,7 +32,7 @@ jobs:
       - uses: champ-oss/file-sync@main
         with:
          token: ${{ secrets.GITHUB_TOKEN }}
-         source-repo: champ-oss/terraform-module-template
+         repo: champ-oss/terraform-module-template
          destination-repos: |
            champ-oss/repo1
            champ-oss/repo2
@@ -85,19 +85,21 @@ For example:
 
 ## Parameters
 
-| Parameter               | Required | Description                      |
-|-------------------------|----------|----------------------------------|
-| token                   | false    | GitHub Token or PAT              |
-| source-repo             | true     | Source GitHub repo               |
-| destination-repos       | false    | List of destination repos        |
-| destination-repos-regex | false    | Regex to match destination repos |
-| files                   | true     | List of files to sync            |
-| delete-files            | false    | List of files to delete          |
-| target-branch           | false    | Target branch for pull request   |
-| pull-request-branch     | false    | Branch to push changes           |
-| user                    | false    | Git username                     |
-| email                   | false    | Git email                        |
-| commit-message          | false    | Updated by file-sync             |
+| Parameter               | Required | Description                           |
+|-------------------------|----------|---------------------------------------|
+| token                   | false    | GitHub Token or PAT                   |
+| repo                    | true     | Source GitHub repo                    |
+| repo-branch             | true     | Source GitHub repo branch name        |
+| destination-repos       | false    | List of destination repos             |
+| destination-repos-regex | false    | Regex to match destination repos      |
+| files                   | true     | List of files to sync                 |
+| delete-files            | false    | List of files to delete               |
+| target-branch           | false    | Target branch for pull request        |
+| pull-request-branch     | false    | Branch to push changes                |
+| pull-request-draft      | false    | Open the pull request in draft status |
+| user                    | false    | Git username                          |
+| email                   | false    | Git email                             |
+| commit-message          | false    | Updated by file-sync                  |
 
 ## Contributing
 

@@ -190,3 +190,28 @@ class TestGitHubUtil(unittest.TestCase):
             FileConfig(source_path='foo/bar.yml', destination_path='foo/bar.yml', content=b'foo\n', sha='123'),
             branch='file-sync'
         )
+
+    def test_delete_files_for_repo(self: Self) -> None:
+        """Validate the delete_files_for_repo function is successful."""
+        self.github_util.repository = MagicMock()
+        self.github_util.repository.get_contents.return_value.sha = '123'
+        self.github_util.repository.delete_file = MagicMock()
+
+        self.github_util.delete_files_for_repo(
+            [FileConfig(source_path='foo/bar.yml', destination_path='foo/bar.yml')]
+        )
+        self.github_util.repository.delete_file.assert_called_once()
+        self.github_util.repository.delete_file.assert_called_with(
+            path='foo/bar.yml', message='Deleted by file-sync', sha='123', branch='file-sync'
+        )
+
+    def test_delete_files_for_repo_with_exception(self: Self) -> None:
+        """Validate the delete_files_for_repo function is successful."""
+        self.github_util.repository = MagicMock()
+        self.github_util.repository.get_contents.side_effect = UnknownObjectException(404)
+        self.github_util.repository.delete_file = MagicMock()
+
+        self.github_util.delete_files_for_repo(
+            [FileConfig(source_path='foo/bar.yml', destination_path='foo/bar.yml')]
+        )
+        self.github_util.repository.delete_file.assert_not_called()

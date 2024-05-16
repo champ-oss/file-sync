@@ -91,6 +91,28 @@ class GitHubUtil:
 
             self._update_file(sync_file, branch='file-sync')
 
+    def delete_files_for_repo(self, delete_files: list[FileConfig]) -> None:
+        """
+        Delete the list of files in the repository.
+
+        :param delete_files: list of files to delete
+        :return: None
+        """
+        if not self.repository:
+            return
+
+        for delete_file in delete_files:
+            try:
+                file = self.repository.get_contents(delete_file.destination_path, ref='main')
+                self.repository.delete_file(path=delete_file.destination_path,
+                                            message='Deleted by file-sync',
+                                            sha=file.sha,
+                                            branch='file-sync')
+                logger.info(f'{self.repository.name}: deleted file: {delete_file.destination_path}')
+
+            except (UnknownObjectException, GithubException) as e:
+                logger.debug(e)
+
     def _create_branch_if_not_exists(self: Self, branch_name: str, source_branch: str = 'main') -> None:
         """
         Create a branch on the repository if it does not already exist.
