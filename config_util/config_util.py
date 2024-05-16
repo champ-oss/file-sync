@@ -71,6 +71,11 @@ class ConfigUtil:
         return os.getenv('INPUT_FILES')
 
     @staticmethod
+    def delete_files() -> str:
+        """Load the config value from the environment variables."""
+        return os.getenv('INPUT_DELETE_FILES')
+
+    @staticmethod
     def destination_repos() -> str:
         """Load the config value from the environment variables."""
         if os.getenv('INPUT_DESTINATION_REPOS'):

@@ -66,3 +66,6 @@ jobs:
           pull-request-draft: 'true'
           files: |
             LICENSE
+          delete-files: |
+            non-existent-file.txt
+            .tflint.hcl

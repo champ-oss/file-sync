@@ -15,6 +15,7 @@ class TestMain(unittest.TestCase):
     def test_main(self: Self) -> None:
         """The main function should be successful."""
         os.environ['INPUT_FILES'] = './foo.txt\n'
+        os.environ['INPUT_DELETE_FILES'] = './bar.txt\n'
         os.environ['INPUT_DESTINATION_REPOS'] = 'destination_repo\n'
         os.environ['INPUT_SOURCE_REPO_BRANCH'] = 'main1'
         os.environ['INPUT_PULL_REQUEST_BRANCH'] = 'main2'
@@ -34,6 +35,11 @@ class TestMain(unittest.TestCase):
 
         main.GitHubUtil().sync_files_for_repo.assert_called_once()
         main.GitHubUtil().sync_files_for_repo.assert_called_with(sync_files)
+
+        main.GitHubUtil().delete_files_for_repo.assert_called_once()
+        main.GitHubUtil().delete_files_for_repo.assert_called_with(
+            [FileConfig(source_path='./bar.txt', destination_path='./bar.txt')]
+        )
 
         main.GitHubUtil().create_pull_request.assert_called_once()
         main.GitHubUtil().create_pull_request.assert_called_with(head_branch='main2', draft=True)
