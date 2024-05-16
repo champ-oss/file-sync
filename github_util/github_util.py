@@ -70,9 +70,9 @@ class GitHubUtil:
                 if repo.archived:
                     continue
                 if pattern.match(repo.name):
+                    logger.info(f'found repository: {org_name}/{repo.name}')
                     repo_list.append(f'{org_name}/{repo.name}')
 
-        logger.info('repositories found:\n', '\n'.join(repo_list))
         return repo_list
 
     @staticmethod

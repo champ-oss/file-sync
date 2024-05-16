@@ -234,14 +234,21 @@ class TestGitHubUtil(unittest.TestCase):
 
         repo1 = MagicMock()
         repo1.name = 'test-repo-1'
+        repo1.archived = False
         repo2 = MagicMock()
         repo2.name = 'test-repo-2'
+        repo2.archived = False
         repo3 = MagicMock()
         repo3.name = 'repo-3'
+        repo3.archived = False
         repo4 = MagicMock()
         repo4.name = 'repo-4'
+        repo4.archived = False
+        repo5 = MagicMock()
+        repo5.name = 'repo-5'
+        repo5.archived = True
 
-        mock_github.get_organization.return_value.get_repos.side_effect = [[repo1, repo2], [repo3, repo4]]
+        mock_github.get_organization.return_value.get_repos.side_effect = [[repo1, repo2], [repo3, repo4, repo5]]
 
         repos_result = GitHubUtil.get_repo_list_from_regex_patterns(
             access_token='',
