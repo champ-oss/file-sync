@@ -62,12 +62,20 @@ class TestConfigUtil(unittest.TestCase):
         os.environ['INPUT_FILES'] = 'foo\bbar'
         self.assertEqual('foo\bbar', ConfigUtil.files())
 
+        os.environ['INPUT_DELETE_FILES'] = 'foo123\bbar123'
+        self.assertEqual('foo123\bbar123', ConfigUtil.delete_files())
+
         os.environ['INPUT_DESTINATION_REPOS'] = 'test1\btest2'
         self.assertEqual('test1\btest2', ConfigUtil.destination_repos())
-
         os.environ['INPUT_DESTINATION_REPOS'] = ''
         os.environ['INPUT_CURRENT_REPOSITORY'] = 'foo1'
         self.assertEqual('foo1', ConfigUtil.destination_repos())
+
+        os.environ['INPUT_DESTINATION_REPOS_REGEX'] = 'test3\btest4'
+        self.assertEqual('test3\btest4', ConfigUtil.destination_repos_regex())
+        os.environ['INPUT_DESTINATION_REPOS_REGEX'] = ''
+        os.environ['INPUT_CURRENT_REPOSITORY'] = 'foo1'
+        self.assertEqual('foo1', ConfigUtil.destination_repos_regex())
 
         os.environ['INPUT_PULL_REQUEST_DRAFT'] = 'true'
         self.assertEqual(True, ConfigUtil.pull_request_draft())

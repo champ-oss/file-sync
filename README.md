@@ -36,7 +36,8 @@ jobs:
          destination-repos: |
            champ-oss/repo1
            champ-oss/repo2
-         destination-repos-regex: champ-oss/terraform-.*
+         destination-repos-regex: |
+           champ-oss/terraform-.*
          files: |
            .gitignore
            Makefile
@@ -58,13 +59,9 @@ If you are syncing workflow files (`.github/workflows`) then you will need to ge
 The destination repositories to sync to can be specified as a list using the `destination-repos` parameter.
 Alternatively, you can use a regex to match multiple destination repositories using the `destination-repos-regex`
 parameter.
-If both parameters are specified then they will be combined. If neither parameters are specified then the repository
-where the action
-is running will be used as the destination.
-
-Note: The `destination-repos-regex` parameter works by scanning the GitHub organization for repositories that match the
-regex.
-This means all the destination repositories must be in the same organization.
+If both parameters are specified then the list of repos will be combined. If both parameters are omitted then the
+repository
+where the action is running will be used as the destination.
 
 ## File list
 One file should be specified per-line. You can specify the file in the format `<source_path>=<destination_path`. The paths are relative to the root of the source and destination repositories. 

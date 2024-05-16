@@ -28,10 +28,10 @@ class ConfigUtil:
             if '=' in line:
                 source, destination = line.split('=')
                 files_config.append(FileConfig(source.strip(), destination.strip()))
-                logger.info(f'configured source file: {source.strip()}')
+                logger.debug(f'configured file: {source.strip()}')
             else:
                 files_config.append(FileConfig(line.strip(), line.strip()))
-                logger.info(f'configured source file: {line.strip()}')
+                logger.debug(f'configured file: {line.strip()}')
 
         return files_config
 
@@ -80,6 +80,14 @@ class ConfigUtil:
         """Load the config value from the environment variables."""
         if os.getenv('INPUT_DESTINATION_REPOS'):
             return os.getenv('INPUT_DESTINATION_REPOS')
+
+        return os.getenv('INPUT_CURRENT_REPOSITORY')
+
+    @staticmethod
+    def destination_repos_regex() -> str:
+        """Load the config value from the environment variables."""
+        if os.getenv('INPUT_DESTINATION_REPOS_REGEX'):
+            return os.getenv('INPUT_DESTINATION_REPOS_REGEX')
 
         return os.getenv('INPUT_CURRENT_REPOSITORY')
 
