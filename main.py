@@ -17,24 +17,36 @@ def main() -> None:
 
     :return: None
     """
-    source_repo = GitHubUtil(access_token=Config.token(), repository_name=Config.source_repo_name())
+    source_repo = GitHubUtil(Config.token(), Config.source_repo_name())
+    destination_repos = _get_destination_repo_list()
+    sync_files = source_repo.get_sync_files_from_source_repo(Config.files(), Config.source_repo_branch())
+    delete_files = Config.parse_files_config_from_input(Config.delete_files())
 
-    destination_repos = Config.parse_list_from_input(Config.destination_repos())
+    for destination_repo_name in destination_repos:
+        destination_repo = GitHubUtil(Config.token(), destination_repo_name)
+        destination_repo.sync_files_for_repo(sync_files)
+        destination_repo.delete_files_for_repo(delete_files)
+        destination_repo.create_pull_request(Config.pull_request_branch(), draft=Config.pull_request_draft())
+
+
+def _get_destination_repo_list() -> list[str]:
+    """
+    Load the list of repositories to sync files to.
+
+    :return: List of repositories.
+    """
+    destination_repos_specified = Config.parse_list_from_input(Config.destination_repos())
+
     destination_repos_found = GitHubUtil.get_repo_list_from_regex_patterns(
         access_token=Config.token(), repo_regex_patterns=Config.parse_list_from_input(Config.destination_repos_regex())
     )
 
-    sync_files = source_repo.get_sync_files_from_source_repo(action_input_files=Config.files(),
-                                                             branch=Config.source_repo_branch())
+    destination_repos_to_exclude = Config.parse_list_from_input(Config.destination_repos_exclude())
 
-    delete_files = Config.parse_files_config_from_input(Config.delete_files())
-
-    for destination_repo_name in set(destination_repos + destination_repos_found):
-        destination_repo = GitHubUtil(access_token=Config.token(), repository_name=destination_repo_name)
-        destination_repo.sync_files_for_repo(sync_files)
-        destination_repo.delete_files_for_repo(delete_files)
-        destination_repo.create_pull_request(head_branch=Config.pull_request_branch(),
-                                             draft=Config.pull_request_draft())
+    return sorted([
+        repo for repo in set(destination_repos_specified + destination_repos_found)
+        if repo not in destination_repos_to_exclude
+    ])
 
 
 if __name__ == '__main__':
