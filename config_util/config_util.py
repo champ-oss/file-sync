@@ -91,6 +91,11 @@ class ConfigUtil:
         return os.getenv('INPUT_DESTINATION_REPOS_REGEX')
 
     @staticmethod
+    def destination_repos_exclude() -> str:
+        """Load the config value from the environment variables."""
+        return os.getenv('INPUT_DESTINATION_REPOS_EXCLUDE')
+
+    @staticmethod
     def pull_request_draft() -> bool:
         """Load the config value from the environment variables."""
         return os.getenv('INPUT_PULL_REQUEST_DRAFT', 'false').lower() == 'true'

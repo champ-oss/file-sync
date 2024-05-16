@@ -73,6 +73,9 @@ class TestConfigUtil(unittest.TestCase):
         os.environ['INPUT_DESTINATION_REPOS_REGEX'] = 'test3\btest4'
         self.assertEqual('test3\btest4', ConfigUtil.destination_repos_regex())
 
+        os.environ['INPUT_DESTINATION_REPOS_EXCLUDE'] = 'test5\btest6'
+        self.assertEqual('test5\btest6', ConfigUtil.destination_repos_exclude())
+
         os.environ['INPUT_PULL_REQUEST_DRAFT'] = 'true'
         self.assertEqual(True, ConfigUtil.pull_request_draft())
 
