@@ -22,6 +22,7 @@ class TestMain(unittest.TestCase):
         os.environ['INPUT_PULL_REQUEST_DRAFT'] = 'true'
 
         main.GitHubUtil = MagicMock()
+        main.GitHubUtil.get_repo_list_from_regex_patterns.return_value = ['destination_repo']
 
         sync_files = [FileConfig(source_path='./foo.txt', destination_path='./foo.txt', sha='123', content=b'test')]
         main.GitHubUtil().get_sync_files_from_source_repo.return_value = sync_files

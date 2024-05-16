@@ -1,6 +1,7 @@
 """Provides tests for GitHub utility."""
+import re
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, call
 
 from github import UnknownObjectException, GithubException
 from typing_extensions import Self
@@ -215,3 +216,54 @@ class TestGitHubUtil(unittest.TestCase):
             [FileConfig(source_path='foo/bar.yml', destination_path='foo/bar.yml')]
         )
         self.github_util.repository.delete_file.assert_not_called()
+
+    def test_get_org_and_repo_pattern_from_regex(self: Self) -> None:
+        """Validate the get_org_and_repo_pattern_from_regex function is successful."""
+        org, repo = GitHubUtil._get_org_and_repo_pattern_from_regex('my-org/^Test-.*$')
+        self.assertEqual('my-org', org)
+        self.assertEqual(re.compile('^Test-.*$', re.IGNORECASE), repo)
+        self.assertTrue(repo.match('test-Repo'))
+        self.assertFalse(repo.match('foo'))
+
+        self.assertRaises(ValueError, GitHubUtil._get_org_and_repo_pattern_from_regex, 'foo')
+
+    def test_get_repo_list_from_regex_patterns(self: Self) -> None:
+        """Validate the get_repo_list_from_regex_patterns function is successful."""
+        mock_github = MagicMock()
+        mock_github.get_organization = MagicMock()
+
+        repo1 = MagicMock()
+        repo1.name = 'test-repo-1'
+        repo1.archived = False
+        repo2 = MagicMock()
+        repo2.name = 'test-repo-2'
+        repo2.archived = False
+        repo3 = MagicMock()
+        repo3.name = 'repo-3'
+        repo3.archived = False
+        repo4 = MagicMock()
+        repo4.name = 'repo-4'
+        repo4.archived = False
+        repo5 = MagicMock()
+        repo5.name = 'repo-5'
+        repo5.archived = True
+
+        mock_github.get_organization.return_value.get_repos.side_effect = [[repo1, repo2], [repo3, repo4, repo5]]
+
+        repos_result = GitHubUtil.get_repo_list_from_regex_patterns(
+            access_token='',
+            repo_regex_patterns=[
+                'test-org1/test-.*',
+                'other-org/^repo-.*$'
+            ],
+            github_session=mock_github
+        )
+        expected = ['test-org1/test-repo-1', 'test-org1/test-repo-2', 'other-org/repo-3', 'other-org/repo-4']
+        self.assertEqual(expected, repos_result)
+
+        mock_github.get_organization.assert_has_calls([
+            call('test-org1'),
+            call().get_repos(),
+            call('other-org'),
+            call().get_repos(),
+        ])
