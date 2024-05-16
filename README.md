@@ -38,6 +38,8 @@ jobs:
            champ-oss/repo2
          destination-repos-regex: |
            champ-oss/terraform-.*
+         destination-repos-exclude: |
+           champ-oss/repo3
          files: |
            .gitignore
            Makefile
@@ -58,7 +60,9 @@ If you are syncing workflow files (`.github/workflows`) then you will need to ge
 
 The destination repositories to sync to can be specified as a list using the `destination-repos` parameter.
 Alternatively, you can use a regex to match multiple destination repositories using the `destination-repos-regex`
-parameter. Destination repos should be specified in the format `owner/repo`.
+parameter.
+
+Destination repos should be specified in the format `owner/repo`.
 If both parameters are specified then the list of repos will be combined. If both parameters are omitted then the
 repository
 where the action is running will be used as the destination.
@@ -82,21 +86,22 @@ For example:
 
 ## Parameters
 
-| Parameter               | Required | Description                           |
-|-------------------------|----------|---------------------------------------|
-| token                   | false    | GitHub Token or PAT                   |
-| repo                    | true     | Source GitHub repo                    |
-| repo-branch             | true     | Source GitHub repo branch name        |
-| destination-repos       | false    | List of destination repos             |
-| destination-repos-regex | false    | Regex to match destination repos      |
-| files                   | true     | List of files to sync                 |
-| delete-files            | false    | List of files to delete               |
-| target-branch           | false    | Target branch for pull request        |
-| pull-request-branch     | false    | Branch to push changes                |
-| pull-request-draft      | false    | Open the pull request in draft status |
-| user                    | false    | Git username                          |
-| email                   | false    | Git email                             |
-| commit-message          | false    | Updated by file-sync                  |
+| Parameter                 | Required | Description                           |
+|---------------------------|----------|---------------------------------------|
+| token                     | false    | GitHub Token or PAT                   |
+| repo                      | true     | Source GitHub repo                    |
+| repo-branch               | true     | Source GitHub repo branch name        |
+| destination-repos         | false    | List of destination repos             |
+| destination-repos-regex   | false    | Regex to match destination repos      |
+| destination-repos-exclude | false    | List of destination repos to exclude  |
+| files                     | true     | List of files to sync                 |
+| delete-files              | false    | List of files to delete               |
+| target-branch             | false    | Target branch for pull request        |
+| pull-request-branch       | false    | Branch to push changes                |
+| pull-request-draft        | false    | Open the pull request in draft status |
+| user                      | false    | Git username                          |
+| email                     | false    | Git email                             |
+| commit-message            | false    | Updated by file-sync                  |
 
 ## Contributing
 

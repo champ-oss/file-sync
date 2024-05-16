@@ -80,18 +80,15 @@ class ConfigUtil:
     @staticmethod
     def destination_repos() -> str:
         """Load the config value from the environment variables."""
-        if os.getenv('INPUT_DESTINATION_REPOS'):
-            return os.getenv('INPUT_DESTINATION_REPOS')
+        if not os.getenv('INPUT_DESTINATION_REPOS') and not os.getenv('INPUT_DESTINATION_REPOS_REGEX'):
+            return os.getenv('INPUT_CURRENT_REPOSITORY')
 
-        return os.getenv('INPUT_CURRENT_REPOSITORY')
+        return os.getenv('INPUT_DESTINATION_REPOS')
 
     @staticmethod
     def destination_repos_regex() -> str:
         """Load the config value from the environment variables."""
-        if os.getenv('INPUT_DESTINATION_REPOS_REGEX'):
-            return os.getenv('INPUT_DESTINATION_REPOS_REGEX')
-
-        return os.getenv('INPUT_CURRENT_REPOSITORY')
+        return os.getenv('INPUT_DESTINATION_REPOS_REGEX')
 
     @staticmethod
     def pull_request_draft() -> bool:
