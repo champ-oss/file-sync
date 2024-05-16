@@ -47,6 +47,8 @@ class TestConfigUtil(unittest.TestCase):
         self.assertEqual(['item1', 'item2', 'item3'], ConfigUtil.parse_list_from_input('item1\nitem2\nitem3\n'))
         self.assertEqual(['item1', 'item2', 'item3'], ConfigUtil.parse_list_from_input('item1\n item2 \nitem3\n'))
         self.assertEqual(['item1', 'item2', 'item3'], ConfigUtil.parse_list_from_input(' item1\n item2 \nitem3\n '))
+        self.assertEqual([], ConfigUtil.parse_list_from_input(''))
+        self.assertEqual([], ConfigUtil.parse_list_from_input(None))
 
     def test_load_configs(self: Self) -> None:
         """The functions to load variables should be successful."""

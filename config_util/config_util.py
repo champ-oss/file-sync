@@ -44,6 +44,8 @@ class ConfigUtil:
         :return: list of strings
         """
         results = []
+        if not action_input:
+            return results
         for line in action_input.split('\n'):
             if line.strip() == '':
                 continue
