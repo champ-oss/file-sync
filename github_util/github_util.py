@@ -1,6 +1,7 @@
 """Provides functionality for interfacing with GitHub repositories."""
 import base64
 import logging
+import re
 from typing import Optional
 
 from github import Github, Auth, UnknownObjectException, GithubException
@@ -45,6 +46,46 @@ class GitHubUtil:
         except (UnknownObjectException, GithubException) as e:
             logger.warning(f'unable to find repository: {repository_name} error:{e}')
             return None
+
+    @staticmethod
+    def get_repo_list_from_regex_patterns(access_token: str, repo_regex_patterns: list[str],
+                                          github_session: Github = None) -> list[str]:
+        """
+        Get a list of GitHub repository names which match the regex patterns.
+
+        :param access_token: GitHub access token
+        :param repo_regex_patterns: list of regex patterns for repositories
+        :param github_session: authenticated session to GitHub
+        :return:
+        """
+        if not github_session:
+            github_session = Github(auth=Auth.Token(access_token))
+
+        repo_list: list[str] = []
+
+        for repo_regex in repo_regex_patterns:
+            org_name, pattern = GitHubUtil._get_org_and_repo_pattern_from_regex(repo_regex)
+            for repo in github_session.get_organization(org_name).get_repos():
+                if pattern.match(repo.name):
+                    repo_list.append(f'{org_name}/{repo.name}')
+
+        return repo_list
+
+    @staticmethod
+    def _get_org_and_repo_pattern_from_regex(repo_regex_pattern: str) -> (str, re.Pattern):
+        """
+        Parse the GitHub organization and repository regex pattern from a string. (ex: some-org/^repo-.*$).
+
+        :param repo_regex_pattern: string containing the organization and repository regex pattern
+        :return: tuple of organization name and compiled regex pattern
+        """
+        try:
+            org_name, repo_regex = repo_regex_pattern.split('/')
+        except ValueError as e:
+            logger.exception(f'Invalid repo pattern: {repo_regex_pattern}. Use the format: "org/repo"')
+            raise ValueError() from e
+        else:
+            return org_name, re.compile(repo_regex, re.I)
 
     def get_sync_files_from_source_repo(self: Self, action_input_files: str,
                                         branch: str = 'main') -> Optional[list[FileConfig]]:

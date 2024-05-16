@@ -58,7 +58,7 @@ If you are syncing workflow files (`.github/workflows`) then you will need to ge
 
 The destination repositories to sync to can be specified as a list using the `destination-repos` parameter.
 Alternatively, you can use a regex to match multiple destination repositories using the `destination-repos-regex`
-parameter.
+parameter. Destination repos should be specified in the format `owner/repo`.
 If both parameters are specified then the list of repos will be combined. If both parameters are omitted then the
 repository
 where the action is running will be used as the destination.
