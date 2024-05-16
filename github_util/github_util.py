@@ -72,7 +72,7 @@ class GitHubUtil:
                 if pattern.match(repo.name):
                     repo_list.append(f'{org_name}/{repo.name}')
 
-        logger.info(f'repositories found: {repo_list}')
+        logger.info('repositories found:\n', '\n'.join(repo_list))
         return repo_list
 
     @staticmethod
@@ -198,8 +198,8 @@ class GitHubUtil:
                          f'on {branch} branch: {source_file.destination_path}')
             return True
 
-        logger.warning(f'{self.repository.name}: file needs to be updated '
-                       f'on {branch} branch: {source_file.destination_path}')
+        logger.debug(f'{self.repository.name}: file needs to be updated '
+                     f'on {branch} branch: {source_file.destination_path}')
         return False
 
     def _update_file(self: Self, sync_file: FileConfig, branch: str) -> None:
@@ -212,7 +212,7 @@ class GitHubUtil:
         """
         try:
             destination_file = self.repository.get_contents(sync_file.destination_path, ref=branch)
-            logger.info(f'{self.repository.name}: updating file: {sync_file.destination_path}')
+            logger.warning(f'{self.repository.name}: updating file: {sync_file.destination_path}')
             self.repository.update_file(path=sync_file.destination_path,
                                         message='Updated by file-sync',
                                         content=sync_file.content,
@@ -221,7 +221,7 @@ class GitHubUtil:
 
         except (UnknownObjectException, GithubException) as e:
             logger.debug(e)
-            logger.info(f'{self.repository.name}: creating file: {sync_file.destination_path}')
+            logger.warning(f'{self.repository.name}: creating file: {sync_file.destination_path}')
             self.repository.create_file(path=sync_file.destination_path,
                                         message='Updated by file-sync',
                                         content=sync_file.content,
