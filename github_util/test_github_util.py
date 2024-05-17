@@ -84,7 +84,7 @@ class TestGitHubUtil(unittest.TestCase):
         source_file = FileConfig(source_path='', destination_path='foo', content=b'foo')
         self.github_util.repository = MagicMock()
         self.github_util.repository.get_contents.return_value.sha = '456'
-        self.github_util._update_file(source_file, branch='main')
+        self.github_util._update_file(source_file, branch='main', message='Updated by file-sync')
         self.github_util.repository.update_file.assert_called_once()
         self.github_util.repository.update_file.assert_called_with(
             path='foo', message='Updated by file-sync', content=b'foo', sha='456', branch='main'
@@ -95,7 +95,7 @@ class TestGitHubUtil(unittest.TestCase):
         source_file = FileConfig(source_path='', destination_path='foo', content=b'foo')
         self.github_util.repository = MagicMock()
         self.github_util.repository.get_contents.side_effect = UnknownObjectException(404)
-        self.github_util._update_file(source_file, branch='main')
+        self.github_util._update_file(source_file, branch='main', message='Updated by file-sync')
         self.github_util.repository.create_file.assert_called_once()
         self.github_util.repository.create_file.assert_called_with(
             path='foo', message='Updated by file-sync', content=b'foo', branch='main'
@@ -104,7 +104,7 @@ class TestGitHubUtil(unittest.TestCase):
     def test_create_pull_request(self: Self) -> None:
         """Validate the create_pull_request function is successful."""
         self.github_util.repository = MagicMock()
-        self.github_util.create_pull_request('test-branch')
+        self.github_util.create_pull_request(head_branch='test-branch', base_branch='main', title='file-sync')
         self.github_util.repository.create_pull.assert_called_once()
         self.github_util.repository.create_pull.assert_called_with(
             title='file-sync', head='test-branch', base='main', draft=False
@@ -113,7 +113,7 @@ class TestGitHubUtil(unittest.TestCase):
         self.github_util.repository = MagicMock()
         self.github_util.repository.create_pull.side_effect = GithubException(status=422,
                                                                               data={'message': 'Invalid request'})
-        self.github_util.create_pull_request('test-branch')
+        self.github_util.create_pull_request(head_branch='test-branch', base_branch='main', title='file-sync')
         self.github_util.repository.create_pull.assert_called_once()
         self.github_util.repository.create_pull.assert_called_with(
             title='file-sync', head='test-branch', base='main', draft=False
@@ -146,7 +146,8 @@ class TestGitHubUtil(unittest.TestCase):
         self.github_util._update_file = MagicMock()
 
         self.github_util.sync_files_for_repo(
-            [FileConfig(source_path='foo/bar.yml', destination_path='foo/bar.yml', content=b'foo\n', sha='123')]
+            [FileConfig(source_path='foo/bar.yml', destination_path='foo/bar.yml', content=b'foo\n', sha='123')],
+            file_sync_branch='file-sync', main_branch='main', commit_message='Updated by file-sync'
         )
         self.github_util._is_file_up_to_date.assert_called_once()
         self.github_util._create_branch_if_not_exists.assert_not_called()
@@ -164,10 +165,11 @@ class TestGitHubUtil(unittest.TestCase):
         self.github_util._update_file = MagicMock()
 
         self.github_util.sync_files_for_repo(
-            [FileConfig(source_path='foo/bar.yml', destination_path='foo/bar.yml', content=b'foo\n', sha='123')]
+            [FileConfig(source_path='foo/bar.yml', destination_path='foo/bar.yml', content=b'foo\n', sha='123')],
+            file_sync_branch='file-sync', main_branch='main', commit_message='Updated by file-sync'
         )
         self.github_util._create_branch_if_not_exists.assert_called_once()
-        self.github_util._create_branch_if_not_exists.assert_called_with('file-sync')
+        self.github_util._create_branch_if_not_exists.assert_called_with(branch_name='file-sync', source_branch='main')
         self.github_util._update_file.assert_not_called()
 
     def test_sync_files_for_repo_when_not_up_to_date(self: Self) -> None:
@@ -182,14 +184,17 @@ class TestGitHubUtil(unittest.TestCase):
         self.github_util._update_file = MagicMock()
 
         self.github_util.sync_files_for_repo(
-            [FileConfig(source_path='foo/bar.yml', destination_path='foo/bar.yml', content=b'foo\n', sha='123')]
+            [FileConfig(source_path='foo/bar.yml', destination_path='foo/bar.yml', content=b'foo\n', sha='123')],
+            file_sync_branch='file-sync', main_branch='main', commit_message='Updated by file-sync'
         )
         self.github_util._create_branch_if_not_exists.assert_called_once()
-        self.github_util._create_branch_if_not_exists.assert_called_with('file-sync')
+        self.github_util._create_branch_if_not_exists.assert_called_with(branch_name='file-sync', source_branch='main')
         self.github_util._update_file.assert_called_once()
         self.github_util._update_file.assert_called_with(
-            FileConfig(source_path='foo/bar.yml', destination_path='foo/bar.yml', content=b'foo\n', sha='123'),
-            branch='file-sync'
+            sync_file=FileConfig(source_path='foo/bar.yml', destination_path='foo/bar.yml', content=b'foo\n',
+                                 sha='123'),
+            branch='file-sync',
+            message='Updated by file-sync'
         )
 
     def test_delete_files_for_repo(self: Self) -> None:
@@ -199,7 +204,10 @@ class TestGitHubUtil(unittest.TestCase):
         self.github_util.repository.delete_file = MagicMock()
 
         self.github_util.delete_files_for_repo(
-            [FileConfig(source_path='foo/bar.yml', destination_path='foo/bar.yml')]
+            [FileConfig(source_path='foo/bar.yml', destination_path='foo/bar.yml')],
+            message='Deleted by file-sync',
+            file_sync_branch='file-sync',
+            main_branch='main'
         )
         self.github_util.repository.delete_file.assert_called_once()
         self.github_util.repository.delete_file.assert_called_with(
@@ -213,7 +221,10 @@ class TestGitHubUtil(unittest.TestCase):
         self.github_util.repository.delete_file = MagicMock()
 
         self.github_util.delete_files_for_repo(
-            [FileConfig(source_path='foo/bar.yml', destination_path='foo/bar.yml')]
+            [FileConfig(source_path='foo/bar.yml', destination_path='foo/bar.yml')],
+            message='Deleted by file-sync',
+            file_sync_branch='file-sync',
+            main_branch='main'
         )
         self.github_util.repository.delete_file.assert_not_called()
 

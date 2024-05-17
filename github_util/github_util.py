@@ -114,11 +114,15 @@ class GitHubUtil:
 
         return sync_files
 
-    def sync_files_for_repo(self: Self, sync_files: list[FileConfig]) -> None:
+    def sync_files_for_repo(self: Self, sync_files: list[FileConfig],
+                            file_sync_branch: str, main_branch: str, commit_message: str) -> None:
         """
         Sync the list of files to the repository.
 
         :param sync_files: list of files to sync
+        :param file_sync_branch: branch to sync files to
+        :param main_branch: default branch to compare files against
+        :param commit_message: commit message for the file sync
         :return: None
         """
         if not self.repository:
@@ -126,21 +130,25 @@ class GitHubUtil:
 
         logger.info(f'{self.repository.name}: checking files')
         for sync_file in sync_files:
-            if self._is_file_up_to_date(sync_file, branch='main'):
+            if self._is_file_up_to_date(source_file=sync_file, branch=main_branch):
                 continue
 
-            self._create_branch_if_not_exists('file-sync')
+            self._create_branch_if_not_exists(branch_name=file_sync_branch, source_branch=main_branch)
 
-            if self._is_file_up_to_date(sync_file, branch='file-sync'):
+            if self._is_file_up_to_date(source_file=sync_file, branch=file_sync_branch):
                 continue
 
-            self._update_file(sync_file, branch='file-sync')
+            self._update_file(sync_file=sync_file, branch=file_sync_branch, message=commit_message)
 
-    def delete_files_for_repo(self: Self, delete_files: list[FileConfig]) -> None:
+    def delete_files_for_repo(self: Self, delete_files: list[FileConfig], message: str,
+                              file_sync_branch: str, main_branch: str) -> None:
         """
         Delete the list of files in the repository.
 
         :param delete_files: list of files to delete
+        :param message: commit message for the deletion
+        :param file_sync_branch: branch to delete files from
+        :param main_branch: default branch to compare files against
         :return: None
         """
         if not self.repository:
@@ -150,9 +158,9 @@ class GitHubUtil:
             try:
                 self.repository.delete_file(
                     path=delete_file.destination_path,
-                    message='Deleted by file-sync',
-                    sha=self.repository.get_contents(delete_file.destination_path, ref='main').sha,
-                    branch='file-sync'
+                    message=message,
+                    sha=self.repository.get_contents(delete_file.destination_path, ref=main_branch).sha,
+                    branch=file_sync_branch
                 )
                 logger.info(f'{self.repository.name}: deleted file: {delete_file.destination_path}')
 
@@ -202,19 +210,20 @@ class GitHubUtil:
                      f'on {branch} branch: {source_file.destination_path}')
         return False
 
-    def _update_file(self: Self, sync_file: FileConfig, branch: str) -> None:
+    def _update_file(self: Self, sync_file: FileConfig, branch: str, message: str) -> None:
         """
         Update the file in the destination repository, or create a new file if it does not exist.
 
         :param sync_file: file to update
         :param branch: branch to push changes
+        :param message: commit message
         :return: None
         """
         try:
             destination_file = self.repository.get_contents(sync_file.destination_path, ref=branch)
             logger.warning(f'{self.repository.name}: updating file: {sync_file.destination_path}')
             self.repository.update_file(path=sync_file.destination_path,
-                                        message='Updated by file-sync',
+                                        message=message,
                                         content=sync_file.content,
                                         sha=destination_file.sha,
                                         branch=branch)
@@ -223,16 +232,17 @@ class GitHubUtil:
             logger.debug(e)
             logger.warning(f'{self.repository.name}: creating file: {sync_file.destination_path}')
             self.repository.create_file(path=sync_file.destination_path,
-                                        message='Updated by file-sync',
+                                        message=message,
                                         content=sync_file.content,
                                         branch=branch)
 
-    def create_pull_request(self: Self, head_branch: str, base_branch: str = 'main', draft: bool = False) -> None:
+    def create_pull_request(self: Self, head_branch: str, base_branch: str, title: str, draft: bool = False) -> None:
         """
         Create a pull request on the destination repository.
 
         :param head_branch: source branch for the pull request
         :param base_branch: target branch for the pull request (default: main)
+        :param title: title of the pull request
         :param draft: create a draft pull request (default: False)
         :return:
         """
@@ -240,7 +250,7 @@ class GitHubUtil:
             return
 
         try:
-            pull_request = self.repository.create_pull(title='file-sync',
+            pull_request = self.repository.create_pull(title=title,
                                                        head=head_branch,
                                                        base=base_branch,
                                                        draft=draft)
