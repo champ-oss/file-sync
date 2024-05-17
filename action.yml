@@ -17,6 +17,9 @@ inputs:
   destination-repos-regex:
     description: 'Regex to match destination repos'
     required: false
+  destination-repos-exclude:
+    description: 'List of destination repos to exclude'
+    required: false
   files:
     description: 'List of files to sync'
     required: true
@@ -71,6 +74,7 @@ runs:
         INPUT_SOURCE_REPO_BRANCH: ${{ inputs.repo-branch }}
         INPUT_DESTINATION_REPOS: ${{ inputs.destination-repos }}
         INPUT_DESTINATION_REPOS_REGEX: ${{ inputs.destination-repos-regex }}
+        INPUT_DESTINATION_REPOS_EXCLUDE: ${{ inputs.destination-repos-exclude }}
         INPUT_FILES: ${{ inputs.files }}
         INPUT_DELETE_FILES: ${{ inputs.delete-files }}
         INPUT_TARGET_BRANCH: ${{ inputs.target-branch }}

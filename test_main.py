@@ -30,9 +30,7 @@ class TestMain(unittest.TestCase):
         main.main()
 
         main.GitHubUtil().get_sync_files_from_source_repo.assert_called_once()
-        main.GitHubUtil().get_sync_files_from_source_repo.assert_called_with(
-            action_input_files='./foo.txt\n', branch='main1'
-        )
+        main.GitHubUtil().get_sync_files_from_source_repo.assert_called_with('./foo.txt\n', 'main1')
 
         main.GitHubUtil().sync_files_for_repo.assert_called_once()
         main.GitHubUtil().sync_files_for_repo.assert_called_with(sync_files)
@@ -43,4 +41,20 @@ class TestMain(unittest.TestCase):
         )
 
         main.GitHubUtil().create_pull_request.assert_called_once()
-        main.GitHubUtil().create_pull_request.assert_called_with(head_branch='main2', draft=True)
+        main.GitHubUtil().create_pull_request.assert_called_with('main2', draft=True)
+
+    def test_get_destination_repo_list(self: Self) -> None:
+        """The destination repo list should be successfully loaded."""
+        os.environ['INPUT_DESTINATION_REPOS'] = 'destination_repo1\ndestination_repo2\n'
+        os.environ['INPUT_DESTINATION_REPOS_EXCLUDE'] = 'destination_repo3\n'
+
+        main.GitHubUtil = MagicMock()
+        main.GitHubUtil.get_repo_list_from_regex_patterns.return_value = [
+            'destination_repo3',
+            'destination_repo4',
+            'destination_repo1',
+        ]
+
+        self.assertListEqual(
+            ['destination_repo1', 'destination_repo2', 'destination_repo4', ], main._get_destination_repo_list()
+        )

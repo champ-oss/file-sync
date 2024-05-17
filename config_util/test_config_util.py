@@ -69,18 +69,21 @@ class TestConfigUtil(unittest.TestCase):
 
         os.environ['INPUT_DESTINATION_REPOS'] = 'test1\btest2'
         self.assertEqual('test1\btest2', ConfigUtil.destination_repos())
-        os.environ['INPUT_DESTINATION_REPOS'] = ''
-        os.environ['INPUT_CURRENT_REPOSITORY'] = 'foo1'
-        self.assertEqual('foo1', ConfigUtil.destination_repos())
 
         os.environ['INPUT_DESTINATION_REPOS_REGEX'] = 'test3\btest4'
         self.assertEqual('test3\btest4', ConfigUtil.destination_repos_regex())
-        os.environ['INPUT_DESTINATION_REPOS_REGEX'] = ''
-        os.environ['INPUT_CURRENT_REPOSITORY'] = 'foo1'
-        self.assertEqual('foo1', ConfigUtil.destination_repos_regex())
+
+        os.environ['INPUT_DESTINATION_REPOS_EXCLUDE'] = 'test5\btest6'
+        self.assertEqual('test5\btest6', ConfigUtil.destination_repos_exclude())
 
         os.environ['INPUT_PULL_REQUEST_DRAFT'] = 'true'
         self.assertEqual(True, ConfigUtil.pull_request_draft())
 
         os.environ['INPUT_PULL_REQUEST_BRANCH'] = 'test'
         self.assertEqual('test', ConfigUtil.pull_request_branch())
+
+        # If both destination repo inputs are empty then the current repo should be used.
+        os.environ['INPUT_DESTINATION_REPOS'] = ''
+        os.environ['INPUT_DESTINATION_REPOS_REGEX'] = ''
+        os.environ['INPUT_CURRENT_REPOSITORY'] = 'foo1'
+        self.assertEqual('foo1', ConfigUtil.destination_repos())

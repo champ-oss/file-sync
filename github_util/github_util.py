@@ -124,7 +124,7 @@ class GitHubUtil:
         if not self.repository:
             return
 
-        logger.info(f'{self.repository.name}: starting sync process')
+        logger.info(f'{self.repository.name}: checking files')
         for sync_file in sync_files:
             if self._is_file_up_to_date(sync_file, branch='main'):
                 continue
