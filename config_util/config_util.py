@@ -114,3 +114,8 @@ class ConfigUtil:
     def pull_request_branch() -> str:
         """Load the config value from the environment variables."""
         return os.getenv('INPUT_PULL_REQUEST_BRANCH')
+
+    @staticmethod
+    def pull_request_title() -> str:
+        """Load the config value from the environment variables."""
+        return os.getenv('INPUT_PULL_REQUEST_TITLE')

@@ -82,6 +82,9 @@ class TestConfigUtil(unittest.TestCase):
         os.environ['INPUT_PULL_REQUEST_BRANCH'] = 'test'
         self.assertEqual('test', ConfigUtil.pull_request_branch())
 
+        os.environ['INPUT_PULL_REQUEST_TITLE'] = 'test pr'
+        self.assertEqual('test pr', ConfigUtil.pull_request_title())
+
         os.environ['INPUT_TARGET_BRANCH'] = 'test-branch'
         self.assertEqual('test-branch', ConfigUtil.target_branch())
 
