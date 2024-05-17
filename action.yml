@@ -34,19 +34,15 @@ inputs:
     description: 'Branch to push changes'
     required: false
     default: 'file-sync'
+  pull-request-title:
+    description: 'The title of the pull request'
+    required: false
+    default: 'file-sync'
   pull-request-draft:
     description: 'Open the pull request in draft status'
     required: false
     type: boolean
     default: 'false'
-  user:
-    description: 'Git username'
-    required: false
-    default: 'file-sync'
-  email:
-    description: 'Git email'
-    required: false
-    default: '41898282+github-actions[bot]@users.noreply.github.com'
   commit-message:
     description: 'Commit message to use when updating files'
     required: false
@@ -79,8 +75,7 @@ runs:
         INPUT_DELETE_FILES: ${{ inputs.delete-files }}
         INPUT_TARGET_BRANCH: ${{ inputs.target-branch }}
         INPUT_PULL_REQUEST_BRANCH: ${{ inputs.pull-request-branch }}
+        INPUT_PULL_REQUEST_TITLE: ${{ inputs.pull-request-title }}
         INPUT_PULL_REQUEST_DRAFT: ${{ inputs.pull-request-draft }}
-        INPUT_USER: ${{ inputs.user }}
-        INPUT_EMAIL: ${{ inputs.email }}
         INPUT_COMMIT_MESSAGE: ${{ inputs.commit-message }}
         INPUT_CURRENT_REPOSITORY: ${{ github.repository }}

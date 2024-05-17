@@ -96,6 +96,16 @@ class ConfigUtil:
         return os.getenv('INPUT_DESTINATION_REPOS_EXCLUDE')
 
     @staticmethod
+    def target_branch() -> str:
+        """Load the config value from the environment variables."""
+        return os.getenv('INPUT_TARGET_BRANCH')
+
+    @staticmethod
+    def commit_message() -> str:
+        """Load the config value from the environment variables."""
+        return os.getenv('INPUT_COMMIT_MESSAGE')
+
+    @staticmethod
     def pull_request_draft() -> bool:
         """Load the config value from the environment variables."""
         return os.getenv('INPUT_PULL_REQUEST_DRAFT', 'false').lower() == 'true'
@@ -104,3 +114,8 @@ class ConfigUtil:
     def pull_request_branch() -> str:
         """Load the config value from the environment variables."""
         return os.getenv('INPUT_PULL_REQUEST_BRANCH')
+
+    @staticmethod
+    def pull_request_title() -> str:
+        """Load the config value from the environment variables."""
+        return os.getenv('INPUT_PULL_REQUEST_TITLE')

@@ -24,9 +24,16 @@ def main() -> None:
 
     for destination_repo_name in destination_repos:
         destination_repo = GitHubUtil(Config.token(), destination_repo_name)
-        destination_repo.sync_files_for_repo(sync_files)
-        destination_repo.delete_files_for_repo(delete_files)
-        destination_repo.create_pull_request(Config.pull_request_branch(), draft=Config.pull_request_draft())
+        destination_repo.sync_files_for_repo(sync_files=sync_files, file_sync_branch=Config.pull_request_branch(),
+                                             main_branch=Config.target_branch(), commit_message=Config.commit_message())
+
+        destination_repo.delete_files_for_repo(delete_files=delete_files, message=Config.commit_message(),
+                                               file_sync_branch=Config.pull_request_branch(),
+                                               main_branch=Config.target_branch())
+
+        destination_repo.create_pull_request(head_branch=Config.pull_request_branch(),
+                                             base_branch=Config.target_branch(),
+                                             title=Config.pull_request_title(), draft=Config.pull_request_draft())
 
 
 def _get_destination_repo_list() -> list[str]:

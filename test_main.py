@@ -18,8 +18,11 @@ class TestMain(unittest.TestCase):
         os.environ['INPUT_DELETE_FILES'] = './bar.txt\n'
         os.environ['INPUT_DESTINATION_REPOS'] = 'destination_repo\n'
         os.environ['INPUT_SOURCE_REPO_BRANCH'] = 'main1'
-        os.environ['INPUT_PULL_REQUEST_BRANCH'] = 'main2'
+        os.environ['INPUT_PULL_REQUEST_BRANCH'] = 'file-sync'
+        os.environ['INPUT_PULL_REQUEST_TITLE'] = 'my pull request'
         os.environ['INPUT_PULL_REQUEST_DRAFT'] = 'true'
+        os.environ['INPUT_COMMIT_MESSAGE'] = 'updated files'
+        os.environ['INPUT_TARGET_BRANCH'] = 'main2'
 
         main.GitHubUtil = MagicMock()
         main.GitHubUtil.get_repo_list_from_regex_patterns.return_value = ['destination_repo']
@@ -33,15 +36,20 @@ class TestMain(unittest.TestCase):
         main.GitHubUtil().get_sync_files_from_source_repo.assert_called_with('./foo.txt\n', 'main1')
 
         main.GitHubUtil().sync_files_for_repo.assert_called_once()
-        main.GitHubUtil().sync_files_for_repo.assert_called_with(sync_files)
+        main.GitHubUtil().sync_files_for_repo.assert_called_with(
+            sync_files=sync_files, file_sync_branch='file-sync',
+            main_branch='main2', commit_message='updated files'
+        )
 
         main.GitHubUtil().delete_files_for_repo.assert_called_once()
         main.GitHubUtil().delete_files_for_repo.assert_called_with(
-            [FileConfig(source_path='./bar.txt', destination_path='./bar.txt')]
+            delete_files=[FileConfig(source_path='./bar.txt', destination_path='./bar.txt')],
+            message='updated files', file_sync_branch='file-sync', main_branch='main2'
         )
 
         main.GitHubUtil().create_pull_request.assert_called_once()
-        main.GitHubUtil().create_pull_request.assert_called_with('main2', draft=True)
+        main.GitHubUtil().create_pull_request.assert_called_with(head_branch='file-sync', base_branch='main2',
+                                                                 title='my pull request', draft=True)
 
     def test_get_destination_repo_list(self: Self) -> None:
         """The destination repo list should be successfully loaded."""
