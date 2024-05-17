@@ -82,6 +82,12 @@ class TestConfigUtil(unittest.TestCase):
         os.environ['INPUT_PULL_REQUEST_BRANCH'] = 'test'
         self.assertEqual('test', ConfigUtil.pull_request_branch())
 
+        os.environ['INPUT_TARGET_BRANCH'] = 'test-branch'
+        self.assertEqual('test-branch', ConfigUtil.target_branch())
+
+        os.environ['INPUT_COMMIT_MESSAGE'] = 'test commit'
+        self.assertEqual('test commit', ConfigUtil.commit_message())
+
         # If both destination repo inputs are empty then the current repo should be used.
         os.environ['INPUT_DESTINATION_REPOS'] = ''
         os.environ['INPUT_DESTINATION_REPOS_REGEX'] = ''
