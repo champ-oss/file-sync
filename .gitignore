@@ -50,3 +50,5 @@ override.tf.json
 venv/
 .coverage
 coverage.xml
+
+local.sh

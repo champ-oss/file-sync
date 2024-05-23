@@ -155,17 +155,15 @@ class GitHubUtil:
             return
 
         for delete_file in delete_files:
-            try:
-                self.repository.delete_file(
-                    path=delete_file.destination_path,
-                    message=message,
-                    sha=self.repository.get_contents(delete_file.destination_path, ref=main_branch).sha,
-                    branch=file_sync_branch
-                )
-                logger.info(f'{self.repository.name}: deleted file: {delete_file.destination_path}')
+            if not self._file_exists(sync_file=delete_file, branch=main_branch):
+                continue
 
-            except (UnknownObjectException, GithubException) as e:
-                logger.debug(e)
+            self._create_branch_if_not_exists(branch_name=file_sync_branch, source_branch=main_branch)
+
+            if not self._file_exists(sync_file=delete_file, branch=file_sync_branch):
+                continue
+
+            self._delete_file(sync_file=delete_file, branch=file_sync_branch, message=message)
 
     def _create_branch_if_not_exists(self: Self, branch_name: str, source_branch: str = 'main') -> None:
         """
@@ -210,6 +208,21 @@ class GitHubUtil:
                      f'on {branch} branch: {source_file.destination_path}')
         return False
 
+    def _file_exists(self: Self, sync_file: FileConfig, branch: str) -> bool:
+        """
+        Check if the file exists in the repository.
+
+        :param sync_file: file to check
+        :param branch: branch to check
+        :return: True if the file exists, False if it does not
+        """
+        try:
+            self.repository.get_contents(sync_file.destination_path, ref=branch)
+        except (UnknownObjectException, GithubException) as e:
+            logger.debug(e)
+            return False
+        return True
+
     def _update_file(self: Self, sync_file: FileConfig, branch: str, message: str) -> None:
         """
         Update the file in the destination repository, or create a new file if it does not exist.
@@ -235,6 +248,27 @@ class GitHubUtil:
                                         message=message,
                                         content=sync_file.content,
                                         branch=branch)
+
+    def _delete_file(self: Self, sync_file: FileConfig, branch: str, message: str) -> None:
+        """
+        Delete the file from the repository.
+
+        :param sync_file: file to delete
+        :param branch: branch to delete the file from
+        :param message: commit message
+        :return: None
+        """
+        try:
+            self.repository.delete_file(
+                path=sync_file.destination_path,
+                message=message,
+                sha=self.repository.get_contents(sync_file.destination_path, ref=branch).sha,
+                branch=branch
+            )
+            logger.info(f'{self.repository.name}: deleted file: {sync_file.destination_path}')
+
+        except (UnknownObjectException, GithubException) as e:
+            logger.debug(e)
 
     def create_pull_request(self: Self, head_branch: str, base_branch: str, title: str, draft: bool = False) -> None:
         """
