@@ -197,11 +197,13 @@ class TestGitHubUtil(unittest.TestCase):
             message='Updated by file-sync'
         )
 
-    def test_delete_files_for_repo(self: Self) -> None:
+    def test_delete_files_for_repo_when_already_up_to_date_on_main_branch(self: Self) -> None:
         """Validate the delete_files_for_repo function is successful."""
         self.github_util.repository = MagicMock()
-        self.github_util.repository.get_contents.return_value.sha = '123'
-        self.github_util.repository.delete_file = MagicMock()
+        self.github_util._file_exists = MagicMock()
+        self.github_util._file_exists.return_value = False
+        self.github_util._create_branch_if_not_exists = MagicMock()
+        self.github_util._delete_file = MagicMock()
 
         self.github_util.delete_files_for_repo(
             [FileConfig(source_path='foo/bar.yml', destination_path='foo/bar.yml')],
@@ -209,16 +211,21 @@ class TestGitHubUtil(unittest.TestCase):
             file_sync_branch='file-sync',
             main_branch='main'
         )
-        self.github_util.repository.delete_file.assert_called_once()
-        self.github_util.repository.delete_file.assert_called_with(
-            path='foo/bar.yml', message='Deleted by file-sync', sha='123', branch='file-sync'
-        )
 
-    def test_delete_files_for_repo_with_exception(self: Self) -> None:
+        self.github_util._file_exists.assert_called_once()
+        self.github_util._create_branch_if_not_exists.assert_not_called()
+        self.github_util._delete_file.assert_not_called()
+
+    def test_delete_files_for_repo_when_already_up_to_date_on_file_sync_branch(self: Self) -> None:
         """Validate the delete_files_for_repo function is successful."""
         self.github_util.repository = MagicMock()
-        self.github_util.repository.get_contents.side_effect = UnknownObjectException(404)
-        self.github_util.repository.delete_file = MagicMock()
+        self.github_util._file_exists = MagicMock()
+        self.github_util._file_exists.side_effect = [
+            True,  # file exists on main branch
+            False  # file does not exist on file-sync branch
+        ]
+        self.github_util._create_branch_if_not_exists = MagicMock()
+        self.github_util._delete_file = MagicMock()
 
         self.github_util.delete_files_for_repo(
             [FileConfig(source_path='foo/bar.yml', destination_path='foo/bar.yml')],
@@ -226,7 +233,38 @@ class TestGitHubUtil(unittest.TestCase):
             file_sync_branch='file-sync',
             main_branch='main'
         )
-        self.github_util.repository.delete_file.assert_not_called()
+
+        self.github_util._create_branch_if_not_exists.assert_called_once()
+        self.github_util._create_branch_if_not_exists.assert_called_with(branch_name='file-sync', source_branch='main')
+        self.github_util._delete_file.assert_not_called()
+
+    def test_delete_files_for_repo_when_not_up_to_date(self: Self) -> None:
+        """Validate the delete_files_for_repo function is successful."""
+        self.github_util.repository = MagicMock()
+        self.github_util._file_exists = MagicMock()
+        self.github_util._file_exists.side_effect = [
+            True,  # file exists on main branch
+            True  # file exists on file-sync branch
+        ]
+
+        self.github_util._create_branch_if_not_exists = MagicMock()
+        self.github_util._delete_file = MagicMock()
+
+        self.github_util.delete_files_for_repo(
+            [FileConfig(source_path='foo/bar.yml', destination_path='foo/bar.yml')],
+            message='Deleted by file-sync',
+            file_sync_branch='file-sync',
+            main_branch='main'
+        )
+
+        self.github_util._create_branch_if_not_exists.assert_called_once()
+        self.github_util._create_branch_if_not_exists.assert_called_with(branch_name='file-sync', source_branch='main')
+        self.github_util._delete_file.assert_called_once()
+        self.github_util._delete_file.assert_called_with(
+            sync_file=FileConfig(source_path='foo/bar.yml', destination_path='foo/bar.yml'),
+            branch='file-sync',
+            message='Deleted by file-sync'
+        )
 
     def test_get_org_and_repo_pattern_from_regex(self: Self) -> None:
         """Validate the get_org_and_repo_pattern_from_regex function is successful."""
@@ -278,3 +316,30 @@ class TestGitHubUtil(unittest.TestCase):
             call('other-org'),
             call().get_repos(),
         ])
+
+    def test_file_exists(self: Self) -> None:
+        """Validate the file_exists function is successful."""
+        self.github_util.repository = MagicMock()
+        self.github_util.repository.get_contents.return_value = MagicMock()
+        self.assertTrue(self.github_util._file_exists(FileConfig('foo/bar.yml', 'foo/bar.yml'), 'main'))
+
+        self.github_util.repository = MagicMock()
+        self.github_util.repository.get_contents.side_effect = UnknownObjectException(404)
+        self.assertFalse(self.github_util._file_exists(FileConfig('foo/bar.yml', 'foo/bar.yml'), 'main'))
+
+    def test_delete_file(self: Self) -> None:
+        """Validate the delete_file function is successful."""
+        self.github_util.repository = MagicMock()
+        self.github_util.repository.get_contents.return_value.sha = '123'
+
+        self.github_util._delete_file(FileConfig('foo/bar.yml', 'foo/bar.yml'), 'main', 'Deleted by file-sync')
+        self.github_util.repository.delete_file.assert_called_once()
+        self.github_util.repository.delete_file.assert_called_with(
+            path='foo/bar.yml', message='Deleted by file-sync', sha='123', branch='main'
+        )
+
+        self.github_util.repository = MagicMock()
+        self.github_util.repository.get_contents.return_value.sha = '123'
+        self.github_util.repository.delete_file.side_effect = GithubException(status=404, data={'message': 'not found'})
+        self.github_util._delete_file(FileConfig('foo/bar.yml', 'foo/bar.yml'), 'main', 'Deleted by file-sync')
+        self.github_util.repository.delete_file.assert_called_once()
