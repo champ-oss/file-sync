@@ -104,7 +104,8 @@ class TestGitHubUtil(unittest.TestCase):
     def test_create_pull_request(self: Self) -> None:
         """Validate the create_pull_request function is successful."""
         self.github_util.repository = MagicMock()
-        self.github_util.create_pull_request(head_branch='test-branch', base_branch='main', title='file-sync')
+        self.github_util.repository.default_branch = 'main'
+        self.github_util.create_pull_request(head_branch='test-branch', base_branch='', title='file-sync')
         self.github_util.repository.create_pull.assert_called_once()
         self.github_util.repository.create_pull.assert_called_with(
             title='file-sync', head='test-branch', base='main', draft=False
@@ -147,7 +148,7 @@ class TestGitHubUtil(unittest.TestCase):
 
         self.github_util.sync_files_for_repo(
             [FileConfig(source_path='foo/bar.yml', destination_path='foo/bar.yml', content=b'foo\n', sha='123')],
-            file_sync_branch='file-sync', main_branch='main', commit_message='Updated by file-sync'
+            file_sync_branch='file-sync', base_branch='', commit_message='Updated by file-sync'
         )
         self.github_util._is_file_up_to_date.assert_called_once()
         self.github_util._create_branch_if_not_exists.assert_not_called()
@@ -166,7 +167,7 @@ class TestGitHubUtil(unittest.TestCase):
 
         self.github_util.sync_files_for_repo(
             [FileConfig(source_path='foo/bar.yml', destination_path='foo/bar.yml', content=b'foo\n', sha='123')],
-            file_sync_branch='file-sync', main_branch='main', commit_message='Updated by file-sync'
+            file_sync_branch='file-sync', base_branch='main', commit_message='Updated by file-sync'
         )
         self.github_util._create_branch_if_not_exists.assert_called_once()
         self.github_util._create_branch_if_not_exists.assert_called_with(branch_name='file-sync', source_branch='main')
@@ -175,6 +176,7 @@ class TestGitHubUtil(unittest.TestCase):
     def test_sync_files_for_repo_when_not_up_to_date(self: Self) -> None:
         """Validate the sync_files_for_repo function is successful."""
         self.github_util.repository = MagicMock()
+        self.github_util.repository.default_branch = 'main'
         self.github_util._is_file_up_to_date = MagicMock()
         self.github_util._is_file_up_to_date.side_effect = [
             False,  # file is not up-to-date on main branch
@@ -185,7 +187,7 @@ class TestGitHubUtil(unittest.TestCase):
 
         self.github_util.sync_files_for_repo(
             [FileConfig(source_path='foo/bar.yml', destination_path='foo/bar.yml', content=b'foo\n', sha='123')],
-            file_sync_branch='file-sync', main_branch='main', commit_message='Updated by file-sync'
+            file_sync_branch='file-sync', base_branch='', commit_message='Updated by file-sync'
         )
         self.github_util._create_branch_if_not_exists.assert_called_once()
         self.github_util._create_branch_if_not_exists.assert_called_with(branch_name='file-sync', source_branch='main')
@@ -209,7 +211,7 @@ class TestGitHubUtil(unittest.TestCase):
             [FileConfig(source_path='foo/bar.yml', destination_path='foo/bar.yml')],
             message='Deleted by file-sync',
             file_sync_branch='file-sync',
-            main_branch='main'
+            base_branch=''
         )
 
         self.github_util._file_exists.assert_called_once()
@@ -231,7 +233,7 @@ class TestGitHubUtil(unittest.TestCase):
             [FileConfig(source_path='foo/bar.yml', destination_path='foo/bar.yml')],
             message='Deleted by file-sync',
             file_sync_branch='file-sync',
-            main_branch='main'
+            base_branch='main'
         )
 
         self.github_util._create_branch_if_not_exists.assert_called_once()
@@ -254,7 +256,7 @@ class TestGitHubUtil(unittest.TestCase):
             [FileConfig(source_path='foo/bar.yml', destination_path='foo/bar.yml')],
             message='Deleted by file-sync',
             file_sync_branch='file-sync',
-            main_branch='main'
+            base_branch='main'
         )
 
         self.github_util._create_branch_if_not_exists.assert_called_once()

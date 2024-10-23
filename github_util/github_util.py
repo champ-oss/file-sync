@@ -115,13 +115,13 @@ class GitHubUtil:
         return sync_files
 
     def sync_files_for_repo(self: Self, sync_files: list[FileConfig],
-                            file_sync_branch: str, main_branch: str, commit_message: str) -> None:
+                            file_sync_branch: str, base_branch: str, commit_message: str) -> None:
         """
         Sync the list of files to the repository.
 
         :param sync_files: list of files to sync
         :param file_sync_branch: branch to sync files to
-        :param main_branch: default branch to compare files against
+        :param base_branch: default branch to compare files against
         :param commit_message: commit message for the file sync
         :return: None
         """
@@ -129,11 +129,14 @@ class GitHubUtil:
             return
 
         logger.info(f'{self.repository.name}: checking files')
+        if not base_branch:
+            base_branch = self.repository.default_branch
+
         for sync_file in sync_files:
-            if self._is_file_up_to_date(source_file=sync_file, branch=main_branch):
+            if self._is_file_up_to_date(source_file=sync_file, branch=base_branch):
                 continue
 
-            self._create_branch_if_not_exists(branch_name=file_sync_branch, source_branch=main_branch)
+            self._create_branch_if_not_exists(branch_name=file_sync_branch, source_branch=base_branch)
 
             if self._is_file_up_to_date(source_file=sync_file, branch=file_sync_branch):
                 continue
@@ -141,24 +144,27 @@ class GitHubUtil:
             self._update_file(sync_file=sync_file, branch=file_sync_branch, message=commit_message)
 
     def delete_files_for_repo(self: Self, delete_files: list[FileConfig], message: str,
-                              file_sync_branch: str, main_branch: str) -> None:
+                              file_sync_branch: str, base_branch: str) -> None:
         """
         Delete the list of files in the repository.
 
         :param delete_files: list of files to delete
         :param message: commit message for the deletion
         :param file_sync_branch: branch to delete files from
-        :param main_branch: default branch to compare files against
+        :param base_branch: default branch to compare files against
         :return: None
         """
         if not self.repository:
             return
 
+        if not base_branch:
+            base_branch = self.repository.default_branch
+
         for delete_file in delete_files:
-            if not self._file_exists(sync_file=delete_file, branch=main_branch):
+            if not self._file_exists(sync_file=delete_file, branch=base_branch):
                 continue
 
-            self._create_branch_if_not_exists(branch_name=file_sync_branch, source_branch=main_branch)
+            self._create_branch_if_not_exists(branch_name=file_sync_branch, source_branch=base_branch)
 
             if not self._file_exists(sync_file=delete_file, branch=file_sync_branch):
                 continue
@@ -282,6 +288,9 @@ class GitHubUtil:
         """
         if not self.repository:
             return
+
+        if not base_branch:
+            base_branch = self.repository.default_branch
 
         try:
             pull_request = self.repository.create_pull(title=title,

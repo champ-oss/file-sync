@@ -27,9 +27,9 @@ inputs:
     description: 'List of files to delete'
     required: false
   target-branch:
-    description: 'Target branch for pull request'
+    description: 'Target branch for pull request. The default branch will be used if not specified'
     required: false
-    default: 'main'
+    default: ''
   pull-request-branch:
     description: 'Branch to push changes'
     required: false
