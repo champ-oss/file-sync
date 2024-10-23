@@ -38,13 +38,13 @@ class TestMain(unittest.TestCase):
         main.GitHubUtil().sync_files_for_repo.assert_called_once()
         main.GitHubUtil().sync_files_for_repo.assert_called_with(
             sync_files=sync_files, file_sync_branch='file-sync',
-            main_branch='main2', commit_message='updated files'
+            base_branch='main2', commit_message='updated files'
         )
 
         main.GitHubUtil().delete_files_for_repo.assert_called_once()
         main.GitHubUtil().delete_files_for_repo.assert_called_with(
             delete_files=[FileConfig(source_path='./bar.txt', destination_path='./bar.txt')],
-            message='updated files', file_sync_branch='file-sync', main_branch='main2'
+            message='updated files', file_sync_branch='file-sync', base_branch='main2'
         )
 
         main.GitHubUtil().create_pull_request.assert_called_once()
