@@ -49,5 +49,5 @@ toml==0.10.2
 tomli==2.0.1
 tryceratops==2.3.2
 typing_extensions==4.11.0
-urllib3==2.2.1
+urllib3==2.2.2
 wrapt==1.16.0
